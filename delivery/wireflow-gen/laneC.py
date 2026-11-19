@@ -7,6 +7,7 @@ LOC = '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="
 MAPBTN = ('<button type="button" style="height: 48px; border: 1px solid #D5D8DD; border-radius: 8px; background: #FFFFFF; font: inherit; font-size: 15px; color: #1F2328; display: flex; align-items: center; gap: 10px; padding: 0 14px">'
           + PIN.replace('stroke="#5B6470"', 'stroke="currentColor"') + '<span style="flex: 1; text-align: left">在地圖上選點</span><span style="font-size: 12px; color: #5B6470">選用</span></button>')
 def hdr(title):
+    title = {"pick": "要從哪裡寄？", "drop": "要送到哪裡？"}.get(title, title)
     return (f'<div style="height: 56px; flex-shrink: 0; background: #FFFFFF; display: flex; align-items: center; padding: 0 8px; gap: 4px">'
             f'<a href="#" aria-label="返回" style="width: 44px; height: 44px; display: flex; align-items: center; justify-content: center; color: #1F2328">{BACK}</a>'
             f'<div style="font-size: 17px; font-weight: 700">{title}</div></div>')
@@ -70,7 +71,7 @@ c1 = swapify(c1)
 USE_LOC = ('<button type="button" style="min-height: 56px; border: 1px solid #D5D8DD; border-radius: 8px; background: #FFFFFF; font: inherit; color: #1F2328; display: flex; align-items: center; gap: 10px; padding: 8px 14px; text-align: left">'
            + LOC + '<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 15px; font-weight: 500">使用目前位置</span>'
            '<span style="font-size: 12px; color: #5B6470">需要開啟定位權限</span></span></button>')
-c2 = (ROOT + hdr("設定地址") + inputs(field("pick", "取件", placeholder="輸入取件地址或地標", focus=True), field("drop", "送件", placeholder="輸入送件地址"))
+c2 = (ROOT + hdr("pick") + inputs(field("pick", "取件", placeholder="輸入取件地址或地標", focus=True), field("drop", "送件", placeholder="輸入送件地址"))
       + '<div style="flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">' + USE_LOC + MAPBTN
       + '<div style="font-size: 13px; color: #5B6470">輸入地址或地標後，從搜尋結果選擇。</div></div></div>')
 
@@ -89,9 +90,9 @@ NOTICE = ('<div style="background: #FFFFFF; border: 1px solid #D5D8DD; border-ra
           '<div style="font-size: 14px; font-weight: 700">定位未開啟，無法帶入目前位置</div>'
           '<div style="font-size: 13px; color: #3D444D">可以直接搜尋地址，或到設定開啟定位。</div>'
           '<a href="#settings" style="font-size: 14px; font-weight: 500; min-height: 32px; display: flex; align-items: center">前往設定</a></div></div>')
-c4 = (ROOT + hdr("設定地址") + inputs(field("pick", "取件", value="[輸入中的取件地址]", focus=True), field("drop", "送件", placeholder="輸入送件地址"))
+c4 = (ROOT + hdr("pick") + inputs(field("pick", "取件", value="[輸入中的取件地址]", focus=True), field("drop", "送件", placeholder="輸入送件地址"))
       + '<div style="flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">' + NOTICE + MAPBTN + results() + '</div></div>')
-c5 = (ROOT + hdr("設定地址") + inputs(field("pick", "取件", value="[選好的取件地址]"), field("drop", "送件", value="[輸入中的送件地址]", focus=True))
+c5 = (ROOT + hdr("drop") + inputs(field("pick", "取件", value="[選好的取件地址]"), field("drop", "送件", value="[輸入中的送件地址]", focus=True))
       + '<div style="flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">' + MAPBTN + results()
       + '<div style="font-size: 13px; color: #5B6470">選好送件地址後，進入地址詳情頁。</div></div></div>')
 # ---------- lane A side page: pickup detail with editable sender ----------
@@ -114,11 +115,11 @@ c6 = f3
 c7 = rep(f4, "[目前位置]", "[選好的取件地址]")
 
 laneC = [("1 快遞首頁（第一次進入、沒開定位）", c1, "沒有目前位置也沒有上次地址，取件和送件都標「尚未填寫」。主按鈕寫第一個缺的欄位「填寫取件地址」。一進來不要求定位權限。"),
-         ("2 地址輸入頁（先填取件）", c2, "游標先停在取件欄位。點「使用目前位置」才要求定位權限；之前拒絕過的人點了不會再跳系統詢問，直接出現第 4 頁的提示。"),
+         ("2 地址輸入頁（先填取件）", c2, "游標先停在取件欄位，標題問「要從哪裡寄？」。點「使用目前位置」才要求定位權限；之前拒絕過的人點了不會再跳系統詢問，直接出現第 4 頁的提示。"),
          ("3 系統詢問定位權限", c3, "系統對話框，用途說明由 App 提供。只給大概位置時不自動帶入，只用來排序搜尋結果和當地圖起點。"),
          ("4 地址輸入頁（定位未開啟）", c4, "不擋路：說明定位未開啟並給前往設定的入口，同時可以直接搜尋。搜尋結果一定顯示縣市和行政區。"),
          ("5 取件地址詳情", pkC, "取件地址是使用者自己選的，一定經過這一頁：補樓層門牌，寄件人預設帶入會員資料、可以修改。按確認回到地址輸入頁。Q2"),
-         ("6 地址輸入頁（選好取件）", c5, "取件已填好，游標自動跳到送件欄位。允許定位的人帶入目前位置後也到這一頁，不經過取件地址詳情。"),
+         ("6 地址輸入頁（選好取件）", c5, "取件已填好，游標自動跳到送件欄位，標題跟著改成「要送到哪裡？」。允許定位的人帶入目前位置後也到這一頁，不經過取件地址詳情。"),
          ("7 地址詳情頁（送件）", c6, "與 B 列第 3 頁相同。"),
          ("8 快遞首頁（填完地址）", c7, "取件的樓層門牌與寄件人已在第 5 頁確認過。其餘與 B 列第 4 頁相同。")]
 edgesC = ["點取件列或主按鈕", "點使用目前位置", "不允許", "選好取件地址", "確認", "選好送件地址", "確認", "送出訂單"]

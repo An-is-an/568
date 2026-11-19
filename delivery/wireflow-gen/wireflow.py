@@ -32,7 +32,7 @@ def swapify(h):
 INPUT_SWAP_RE = r'\s*<div style="flex-shrink: 0; display: flex; flex-direction: column; align-items: center; gap: 6px">.*?Q4</div>\s*</div>'
 def noswap(h):
     h, k = re.subn(INPUT_SWAP_RE, '', h, count=1, flags=re.S); assert k == 1
-    return h
+    return rep(h, '<div style="font-size: 17px; font-weight: 700">設定地址</div>', '<div style="font-size: 17px; font-weight: 700">要送到哪裡？</div>')
 LIMIT_BOX = ('<div style="background: #FFFFFF; border: 1px solid #D5D8DD; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">'
              '<svg aria-hidden="true" width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="#1F2328" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0">'
              '<circle cx="8" cy="23" r="3.5"></circle><circle cx="25" cy="23" r="3.5"></circle><path d="M3 18h11v-6H3z"></path><path d="M11.5 23h10l-2-11h-3"></path><path d="M20 12h4"></path></svg>'
@@ -68,6 +68,14 @@ s4 = V2R
 s5 = root("V2ConfirmSheet.dc.html")
 s5, k = re.subn(r'\s*<div style="display: flex; align-items: center; gap: 8px">\s*<div style="flex: 1; min-width: 0; font-size: 13px; color: #5B6470">送出訂單即表示同意.*?Q6</div>\s*</div>', '', s5, flags=re.S)
 assert k == 1
+def addr_cell(addr, who):
+    return ('<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">'
+            f'<div style="font-size: 15px; font-weight: 500">{addr}</div>'
+            f'<div style="font-size: 13px; color: #5B6470">{who}</div></div>')
+s5 = rep(s5, '<div style="flex: 1; min-width: 0; font-size: 15px; font-weight: 500">[取件地址與樓層門牌]</div>', addr_cell("[取件地址與樓層門牌]", "寄件人 [姓名]・[電話]"))
+s5 = rep(s5, '<div style="flex: 1; min-width: 0; font-size: 15px; font-weight: 500">[送件地址與樓層門牌]</div>', addr_cell("[送件地址與樓層門牌]", "收件人 [姓名]・[電話]"))
+s5, k = re.subn(r'\s*<div style="display: flex; gap: 12px; padding: 12px 16px">\s*<div [^>]*>收件人</div>\s*<div [^>]*>\[姓名\]・\[電話\]</div>\s*</div>', '', s5); assert k == 1
+s5, k = re.subn(r'(<div style="display: flex; gap: 12px; padding: 12px 16px); border-bottom: 1px solid #E6E8EB(">\s*<div [^>]*>送件</div>)', r'\1\2', s5); assert k == 1
 s6 = root("V2Success.dc.html")
 
 # hub variants from V2HomeReady
@@ -190,10 +198,10 @@ Y1, Y2 = 400, 3248
 def L(i): return X0 + i * PITCH
 
 laneA = [("1 快遞首頁（剛進入）", s1, "取件與寄件人已帶入，地址卡片右側有對調鈕。主按鈕直接寫「填寫送件地址」，不寫還缺幾項；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。Q2"),
-         ("2 地址輸入頁", s2, "兩個地址同頁，這一頁只選地址，不放對調鈕。"),
+         ("2 地址輸入頁", s2, "兩個地址同頁，這一頁只選地址，不放對調鈕。標題用問句帶出正在填的欄位：填取件時問「要從哪裡寄？」，填送件時問「要送到哪裡？」。"),
          ("3 地址詳情頁（送件）", s3, "收件人併進這一頁，取消配送資訊頁；姓名與電話必填。地址下方可「加入最愛」，按確認時地址、樓層與收件人一起存進最愛。"),
          ("4 快遞首頁（已填完）", s4, "送件地址設定完整後，付款與發票才出現，帶入上次的設定。主按鈕變成「送出訂單・金額」。"),
-         ("5 確認彈窗", s5, "只放地址、收件人與金額。老用戶已讀過運送須知，這裡不再放同意文字。「返回修改」回到第 4 頁。"),
+         ("5 確認彈窗", s5, "只放地址、聯絡人與金額。取件與送件下面各列出寄件人、收件人，地址填反時比較容易發現。老用戶已讀過運送須知，這裡不再放同意文字。「返回修改」回到第 4 頁。"),
          ("6 送出成功", s6, "寫明免費取消的期限並給取消入口。")]
 laneB = [("1 快遞首頁（第一次進入）", f1, "沒有最愛與歷程，取件只帶入目前位置。主按鈕直接寫「填寫送件地址」；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。"),
          ("2 地址輸入頁（沒有歷程）", f2, "沒有歷程與最愛，直接列出搜尋結果。"),

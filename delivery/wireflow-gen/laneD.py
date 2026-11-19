@@ -22,7 +22,7 @@ TOAST = ('<div role="status" style="margin-top: auto; background: #1F2328; color
          '<span>已對調取件與送件</span>'
          '<button type="button" style="min-height: 44px; padding: 0 12px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: #FFFFFF; text-decoration: underline">復原</button></div>')
 d2 = rep(d2, LIMIT_BOX, LIMIT_BOX + "\n    " + TOAST)
-d3 = (ROOT + hdr("設定地址") + inputs(field("pick", "取件", value="[輸入中的取件地址]", focus=True), field("drop", "送件", value="[目前位置或上次地址]"))
+d3 = (ROOT + hdr("pick") + inputs(field("pick", "取件", value="[輸入中的取件地址]", focus=True), field("drop", "送件", value="[目前位置或上次地址]"))
       + '<div style="flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">' + MAPBTN + results()
       + '<div style="font-size: 13px; color: #5B6470">選好取件地址後，進入取件地址詳情。</div></div></div>')
 d4 = rep(pk, "[取件地址]", "[選好的取件地址]")
