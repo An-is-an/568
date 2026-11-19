@@ -55,9 +55,14 @@ def add_save(body):
     old = '修改</a>\n    </div>\n\n    '
     assert body.count(old) == 1
     return body.replace(old, old + SAVE_BTN)
-s3 = rep(add_save(root("AddressDetail.dc.html")), ">完成</a>", ">確認</a>")
+Q1_RE = r'<div style="display: inline-flex[^"]*">Q1</div>\s*<div style="font-size: 12px; color: #5B6470">必填或選填，待確認</div>'
+def required(h):
+    h, k = re.subn(Q1_RE, '<div style="font-size: 12px; color: #5B6470">必填</div>', h); assert k == 1
+    return h
+s3 = rep(required(add_save(root("AddressDetail.dc.html"))), ">完成</a>", ">確認</a>")
 V2R = root("V2HomeReady.dc.html")
 V2R, k = re.subn(r'<a href="#limits"[^>]*>物品的材積與重量限制</a>', lambda m: LIMIT_BOX, V2R); assert k == 1
+V2R, k = re.subn(r'\s*<div style="display: inline-flex[^"]*">Q5</div>', '', V2R); assert k == 1
 V2R = swapify(V2R)
 s4 = V2R
 s5 = root("V2ConfirmSheet.dc.html")
@@ -88,11 +93,11 @@ PAY_ROW_RE = re.escape(P_OPEN) + r'.*?</svg>\s*</div>'
 INV_ROW_RE = re.escape(I_OPEN) + r'.*?</svg>\s*</div>'
 def hub(pay, inv):
     s = rep(V2R, "[取件地址與樓層門牌]", "[目前位置]")
-    pay_v = {"missing": chipval(QTAG.format("Q8"), CH_OUT.format("尚未綁定")),
-             "error": chipval(QTAG.format("Q8"), CH_OUT.format("尚未綁定")),
+    pay_v = {"missing": chipval(CH_OUT.format("尚未綁定")),
+             "error": chipval(CH_OUT.format("尚未綁定")),
              "card": SET.format("[卡別] •••• [末四碼]")}[pay]
     inv_v = {"missing": chipval(CH_OUT.format("尚未設定")),
-             "error": chipval(QTAG.format("Q9"), CH_OUT.format("尚未設定")),
+             "error": chipval(CH_OUT.format("尚未設定")),
              "set": SET.format("手機條碼 [/ABC1234]")}[inv]
     pr = row("付款方式", pay_v, "請先綁定信用卡" if pay == "error" else None)
     ir = row("發票資訊", inv_v, "請先設定發票資訊" if inv == "error" else None, last=True)
@@ -108,7 +113,7 @@ f1 = rep(f1, ">繼續</a>", ">填寫送件地址</a>")
 f1 = rep(f1, '<a href="#info"', LIMIT_BOX + '\n\n    <a href="#info"')
 f1 = swapify(f1)
 f2 = noswap(root("FtAddressInput.dc.html"))
-f3 = rep(add_save(root("FtAddressDetail.dc.html")), ">完成</a>", ">確認</a>")
+f3 = rep(required(add_save(root("FtAddressDetail.dc.html"))), ">完成</a>", ">確認</a>")
 f4 = hub("missing", "missing")
 f4e = hub("error", "error")
 f5 = '''<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFFFFF; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #1F2328; display: flex; flex-direction: column">
@@ -137,6 +142,13 @@ f5 = '''<div style="width: 390px; height: 844px; box-sizing: border-box; backgro
     </button>
   </section>
 </div>'''
+CARD_ROW = ('<label style="min-height: 56px; box-sizing: border-box; border: 2px solid #1F2328; border-radius: 10px; background: #FFFFFF; padding: 0 14px; display: flex; align-items: center; gap: 12px">'
+            '<input type="radio" name="paycard" checked="checked" style="width: 22px; height: 22px; margin: 0; accent-color: #1F2328">'
+            '<span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 500">[卡別] •••• [末四碼]</span>'
+            + QTAG.format("Q8") + '</label>\n    ')
+PAY_LBL = '<div style="font-size: 14px; color: #3D444D">綁定支付</div>\n    '
+f5b = rep(f5, PAY_LBL, PAY_LBL + CARD_ROW)
+f5b = rep(f5b, '</section>\n</div>', '</section>\n  <div role="status" style="margin: auto 16px 24px; background: #1F2328; color: #FFFFFF; border-radius: 10px; padding: 0 16px; min-height: 48px; display: flex; align-items: center; font-size: 14px">已綁定，並選用這張卡</div>\n</div>')
 f6 = hub("card", "error")
 f7 = '''<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFFFFF; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #1F2328; display: flex; flex-direction: column">
   <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; padding: 0 8px; position: relative">
@@ -172,32 +184,33 @@ f10c = s5
 f11 = root("FtSuccess.dc.html")
 
 # ---------- layout ----------
-W, H = 7072, 5724
+W, H = 7612, 5724
 SW, SH, PITCH, X0 = 390, 844, 540, 96
 Y1, Y2 = 400, 3248
 def L(i): return X0 + i * PITCH
 
 laneA = [("1 快遞首頁（剛進入）", s1, "取件與寄件人已帶入，地址卡片右側有對調鈕。主按鈕直接寫「填寫送件地址」，不寫還缺幾項；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。Q2"),
          ("2 地址輸入頁", s2, "兩個地址同頁，這一頁只選地址，不放對調鈕。"),
-         ("3 地址詳情頁（送件）", s3, "收件人併進這一頁，取消配送資訊頁。地址下方可「加入最愛」，按確認時地址、樓層與收件人一起存進最愛。Q1"),
-         ("4 快遞首頁（已填完）", s4, "送件地址設定完整後，付款與發票才出現，帶入上次的設定。主按鈕變成「送出訂單・金額」。Q5"),
+         ("3 地址詳情頁（送件）", s3, "收件人併進這一頁，取消配送資訊頁；姓名與電話必填。地址下方可「加入最愛」，按確認時地址、樓層與收件人一起存進最愛。"),
+         ("4 快遞首頁（已填完）", s4, "送件地址設定完整後，付款與發票才出現，帶入上次的設定。主按鈕變成「送出訂單・金額」。"),
          ("5 確認彈窗", s5, "只放地址、收件人與金額。老用戶已讀過運送須知，這裡不再放同意文字。「返回修改」回到第 4 頁。"),
          ("6 送出成功", s6, "寫明免費取消的期限並給取消入口。")]
 laneB = [("1 快遞首頁（第一次進入）", f1, "沒有最愛與歷程，取件只帶入目前位置。主按鈕直接寫「填寫送件地址」；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。"),
          ("2 地址輸入頁（沒有歷程）", f2, "沒有歷程與最愛，直接列出搜尋結果。"),
-         ("3 地址詳情頁（送件）", f3, "收件人只能手動填或從通訊錄帶入。地址下方可「加入最愛」，下次出現在快遞首頁的最愛與歷程。Q1"),
-         ("4 快遞首頁（還沒綁卡）", f4, "送件地址設定完整後，付款與發票才出現，標「尚未綁定」「尚未設定」。主按鈕是「送出訂單・金額」，不會帶去綁卡或發票。"),
+         ("3 地址詳情頁（送件）", f3, "收件人只能手動填或從通訊錄帶入，姓名與電話必填。地址下方可「加入最愛」，下次出現在快遞首頁的最愛與歷程。"),
+         ("4 快遞首頁（還沒綁卡）", f4, "送件地址設定完整後，付款與發票才出現，標「尚未綁定」「尚未設定」。主按鈕是「送出訂單・金額」，不會帶去綁卡或發票。註冊時填過信箱的會員，發票會帶入「個人・會員信箱」，不會缺發票。"),
          ("5 快遞首頁（按送出後提示）", f4e, "資料不全時按送出訂單不換頁，在付款與發票欄位下方出現紅字；使用者自己點欄位去補。"),
-         ("6 付款與優惠（未綁定）", f5, "沿用現行的付款與優惠頁，從付款欄位進入。按「新增綁定支付」走現行綁卡流程；完成、放棄或失敗都回到快遞首頁，已填資料保留。Q8"),
-         ("7 快遞首頁（綁完卡）", f6, "新卡自動選上，付款的紅字消失；發票的紅字留著，直到設定完成。Q9 有會員載具的話不會缺發票。"),
-         ("8 發票資訊", f7, "沿用現行的整頁發票資訊頁，先不調整做法。從發票欄位進入，填好後按儲存變更回到快遞首頁。"),
-         ("9 快遞首頁（都設定好）", f8, "紅字都消失。第一次下單按送出訂單後，先讀運送須知，讀完再到確認彈窗。"),
-         ("10 運送須知（尚未讀完）", f9, "第一次下單先讀運送須知；沒讀到底不能按同意。Q7"),
-         ("11 運送須知（讀完）", f10, "讀到底後才能按「我已閱讀並同意」。這一頁只處理條款，不放訂單明細。"),
-         ("12 確認彈窗", f10c, "與老用戶相同的確認彈窗。送出前看到的最後一個畫面就是訂單明細。"),
-         ("13 送出成功", f11, "與老用戶相同。")]
+         ("6 付款與優惠（未綁定）", f5, "沿用現行的付款與優惠頁，從付款欄位進入。按「新增綁定支付」走現行綁卡流程（畫面待補）；完成、放棄或失敗都回到這一頁。沒綁卡就返回，回到第 5 頁，紅字仍在。"),
+         ("7 付款與優惠（綁完卡）", f5b, "綁卡完成後回到這一頁，新卡已選上。已綁定時的樣子沒有現行截圖，先示意。按返回回到快遞首頁，已填資料保留。Q8 是否自動選用新卡待確認。"),
+         ("8 快遞首頁（綁完卡）", f6, "付款帶入新卡，紅字消失；發票的紅字留著，直到設定完成。"),
+         ("9 發票資訊", f7, "沿用現行的整頁發票資訊頁，先不調整做法。從發票欄位進入，填好後按儲存變更回到快遞首頁。"),
+         ("10 快遞首頁（都設定好）", f8, "紅字都消失。第一次下單按送出訂單後，先讀運送須知，讀完再到確認彈窗。"),
+         ("11 運送須知（尚未讀完）", f9, "第一次下單先讀運送須知；沒讀到底不能按同意（維持滑到底）。Q6"),
+         ("12 運送須知（讀完）", f10, "讀到底後才能按「我已閱讀並同意」。這一頁只處理條款，不放訂單明細。"),
+         ("13 確認彈窗", f10c, "與老用戶相同的確認彈窗。送出前看到的最後一個畫面就是訂單明細。"),
+         ("14 送出成功", f11, "與老用戶相同。")]
 edgesA = ["點送件列或主按鈕", "選好送件地址", "確認", "送出訂單", "確認送出"]
-edgesB = ["點送件列或主按鈕", "選好送件地址", "確認", "送出訂單", "點付款方式", "新增綁定支付並綁定成功", "點發票資訊", "儲存變更", "送出訂單", "讀到底", "我已閱讀並同意", "確認送出"]
+edgesB = ["點送件列或主按鈕", "選好送件地址", "確認", "送出訂單", "點付款方式", "新增綁定支付並綁定成功", "返回", "點發票資訊", "儲存變更", "送出訂單", "讀到底", "我已閱讀並同意", "確認送出"]
 
 STROKE = "#5B6470"
 mid = [0]
@@ -265,14 +278,14 @@ for i, t in enumerate(edgesB):
     arrows.append(H_(x1, x2, y, True, aria=f"第一次下單：從{laneB[i][0]}到{laneB[i+1][0]}，{t}"))
     lab(x1 + 8, y - 8 - 20 * math.ceil(len(t) / 8), 134, t)
 yb = Y2 + 462; x1 = L(4) + SW + 1; x2 = L(5)
-arrows.append(H_(x1, x2, yb, True, "left", aria="第一次下單：綁卡放棄或失敗，回到快遞首頁（按送出後提示）"))
-lab(x1 + 7, yb + 12, 134, "放棄或失敗")
+arrows.append(H_(x1, x2, yb, True, "left", aria="第一次下單：沒綁卡就從付款與優惠返回，回到快遞首頁（按送出後提示）"))
+lab(x1 + 7, yb + 12, 134, "沒綁卡就返回")
 # bypass 3 -> 8
 BY = 3144
 arrows.append(V_(L(2) + 300, BY, Y2, False, dashed=True))
-arrows.append(H_(L(2) + 300, L(8) + 300, BY, False, dashed=True))
-arrows.append(V_(L(8) + 300, BY, Y2 - 1, True, aria="第一次下單：已綁過卡且有發票設定時，從地址詳情頁直接到快遞首頁（都設定好）", dashed=True))
-lab(L(2) + 360, BY - 28, 700, "已綁過卡且有發票設定（例如叫車時設定過）：略過第 4～8 頁", align="left")
+arrows.append(H_(L(2) + 300, L(9) + 300, BY, False, dashed=True))
+arrows.append(V_(L(9) + 300, BY, Y2 - 1, True, aria="第一次下單：已綁過卡且有發票設定時，從地址詳情頁直接到快遞首頁（都設定好）", dashed=True))
+lab(L(2) + 360, BY - 28, 700, "已綁過卡且有發票設定（例如叫車時設定過）：略過第 4～9 頁", align="left")
 
 # divider
 arrows.append(H_(X0, W - X0, 2964, False))
