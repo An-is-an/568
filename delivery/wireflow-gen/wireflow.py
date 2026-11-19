@@ -145,7 +145,7 @@ f5 = '''<div style="width: 390px; height: 844px; box-sizing: border-box; backgro
 CARD_ROW = ('<label style="min-height: 56px; box-sizing: border-box; border: 2px solid #1F2328; border-radius: 10px; background: #FFFFFF; padding: 0 14px; display: flex; align-items: center; gap: 12px">'
             '<input type="radio" name="paycard" checked="checked" style="width: 22px; height: 22px; margin: 0; accent-color: #1F2328">'
             '<span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 500">[卡別] •••• [末四碼]</span>'
-            + QTAG.format("Q8") + '</label>\n    ')
+            '</label>\n    ')
 PAY_LBL = '<div style="font-size: 14px; color: #3D444D">綁定支付</div>\n    '
 f5b = rep(f5, PAY_LBL, PAY_LBL + CARD_ROW)
 f5b = rep(f5b, '</section>\n</div>', '</section>\n  <div role="status" style="margin: auto 16px 24px; background: #1F2328; color: #FFFFFF; border-radius: 10px; padding: 0 16px; min-height: 48px; display: flex; align-items: center; font-size: 14px">已綁定，並選用這張卡</div>\n</div>')
@@ -201,7 +201,7 @@ laneB = [("1 快遞首頁（第一次進入）", f1, "沒有最愛與歷程，�
          ("4 快遞首頁（還沒綁卡）", f4, "送件地址設定完整後，付款與發票才出現，標「尚未綁定」「尚未設定」。主按鈕是「送出訂單・金額」，不會帶去綁卡或發票。註冊時填過信箱的會員，發票會帶入「個人・會員信箱」，不會缺發票。"),
          ("5 快遞首頁（按送出後提示）", f4e, "資料不全時按送出訂單不換頁，在付款與發票欄位下方出現紅字；使用者自己點欄位去補。"),
          ("6 付款與優惠（未綁定）", f5, "沿用現行的付款與優惠頁，從付款欄位進入。按「新增綁定支付」走現行綁卡流程（畫面待補）；完成、放棄或失敗都回到這一頁。沒綁卡就返回，回到第 5 頁，紅字仍在。"),
-         ("7 付款與優惠（綁完卡）", f5b, "綁卡完成後回到這一頁，新卡已選上。已綁定時的樣子沒有現行截圖，先示意。按返回回到快遞首頁，已填資料保留。Q8 是否自動選用新卡待確認。"),
+         ("7 付款與優惠（綁完卡）", f5b, "綁卡完成後回到這一頁，新卡自動選上（綁卡模組的功能）。已綁定時的樣子沒有現行截圖，先示意。按返回回到快遞首頁，已填資料保留。"),
          ("8 快遞首頁（綁完卡）", f6, "付款帶入新卡，紅字消失；發票的紅字留著，直到設定完成。"),
          ("9 發票資訊", f7, "沿用現行的整頁發票資訊頁，先不調整做法。從發票欄位進入，填好後按儲存變更回到快遞首頁。"),
          ("10 快遞首頁（都設定好）", f8, "紅字都消失。第一次下單按送出訂單後，先讀運送須知，讀完再到確認彈窗。"),
