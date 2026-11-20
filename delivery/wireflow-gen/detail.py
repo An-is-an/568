@@ -56,11 +56,13 @@ def detail(kind, addr, contact="empty"):
     <input type="text" aria-label="樓層或門牌號碼，選填" placeholder="樓層或門牌號碼（選填）" style="{_FIELD}">
     <div style="display: flex; align-items: center; gap: 8px; margin-top: 4px"><span style="font-size: 14px; font-weight: 700">{who}</span>{tag}</div>
     <div style="display: flex; align-items: center; height: 48px; box-sizing: border-box; border: 1px solid #D5D8DD; border-radius: 8px; background: #FFFFFF; padding: 0 2px 0 12px">
-      <span style="font-size: 15px; color: #5B6470; padding-right: 8px">+886</span>
-      <input type="tel" aria-label="{who}手機號碼" {phone} style="flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 15px; color: #1F2328; padding: 0">
+      <input type="text" aria-label="{who}姓名" {name} style="flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 15px; color: #1F2328; padding: 0">
       {_CONTACTS}
     </div>
-    <input type="text" aria-label="{who}姓名" {name} style="{_FIELD}">
+    <div style="display: flex; align-items: center; height: 48px; box-sizing: border-box; border: 1px solid #D5D8DD; border-radius: 8px; background: #FFFFFF; padding: 0 12px">
+      <span style="font-size: 15px; color: #5B6470; padding-right: 8px">+886</span>
+      <input type="tel" aria-label="{who}手機號碼" {phone} style="flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 15px; color: #1F2328; padding: 0">
+    </div>
     <textarea aria-label="備註，選填" placeholder="{note}（選填）" style="height: 64px; box-sizing: border-box; border: 1px solid #D5D8DD; border-radius: 8px; background: #FFFFFF; font: inherit; font-size: 15px; color: #1F2328; padding: 10px 12px; resize: none"></textarea>
     <div style="font-size: 12px; color: #5B6470; margin-top: -4px">目前未開放代收代墊</div>
     {"" if pick else _STAR}
