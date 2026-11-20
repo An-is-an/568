@@ -18,10 +18,6 @@ d2, k = re.subn(r'<a href="AddressInput\.dc\.html" style="display: flex; gap: 12
 d2 = swapify(d2)
 d2 = rep(d2, "最愛與歷程，點一下帶入送件地址", "最愛與歷程，點一下帶入取件地址")
 d2 = rep(d2, ">填寫送件地址</a>", ">填寫取件地址</a>")
-TOAST = ('<div role="status" style="margin-top: auto; background: #1F2328; color: #FFFFFF; border-radius: 10px; padding: 0 4px 0 16px; min-height: 48px; display: flex; align-items: center; justify-content: space-between; font-size: 14px">'
-         '<span>已對調取件與送件</span>'
-         '<button type="button" style="min-height: 44px; padding: 0 12px; border: 0; background: none; font: inherit; font-size: 14px; font-weight: 700; color: #FFFFFF; text-decoration: underline">復原</button></div>')
-d2 = rep(d2, LIMIT_BOX, LIMIT_BOX + "\n    " + TOAST)
 d3 = (ROOT + hdr("設定地址") + inputs(field("pick", "取件", value="[輸入中的取件地址]", focus=True), field("drop", "送件", value="[目前位置或上次地址]"))
       + '<div style="flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">' + MAPBTN + results()
       + '<div style="font-size: 13px; color: #5B6470">選好取件地址後，進入取件地址詳情。</div></div></div>')
@@ -35,7 +31,7 @@ for a_, b_ in [("寄件人 [會員姓名]・[會員電話]", "寄件人 [姓名]
                ("[取件地址與樓層門牌]", "[選好的取件地址]"), ("[送件地址與樓層門牌]", "[目前位置或上次地址]")]:
     d5 = rep(d5, a_, b_)
 laneD = [("1 快遞首頁（剛進入）", d1, "與 A 列第 1 頁相同。地址卡片右側是對調鈕。"),
-         ("2 快遞首頁（對調後）", d2, "聯絡人跟著地址走：會員資料移到收件人，寄件人變空白。主按鈕依第一個缺的地址改成「填寫取件地址」，最愛與歷程改為帶入取件。底部提示可復原。Q4"),
+         ("2 快遞首頁（對調後）", d2, "聯絡人跟著地址走：會員資料移到收件人，寄件人變空白。主按鈕依第一個缺的地址改成「填寫取件地址」，最愛與歷程改為帶入取件。地址卡片的變化已經夠明顯，不另外提示。"),
          ("3 地址輸入頁（填取件）", d3, "游標停在取件欄位，送件已是原本的地址。地址輸入頁不放對調鈕。"),
          ("4 取件地址詳情", d4, "使用者自己選的取件地址，經過取件地址詳情。寄件人不是會員本人，欄位空白，姓名與電話必填。"),
          ("5 快遞首頁（填完地址）", d5, "兩個地址都有，主按鈕變成「送出訂單・金額」，運費依對調後的地址重新計算。")]
