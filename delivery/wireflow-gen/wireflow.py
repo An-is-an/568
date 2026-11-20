@@ -75,7 +75,8 @@ INFO_CARD = ('<div style="border: 1px solid #D5D8DD; border-radius: 12px; displa
              + info_row("時間", "[配送時間]") + info_row("付款", "[付款方式]") + info_row("發票", "[發票設定]", last=True) + '</div>')
 SUM = '<div style="display: flex; justify-content: space-between; align-items: baseline">\n      <div style="font-size: 15px; font-weight: 700">合計</div>'
 s5 = rep(s5, SUM, INFO_CARD + "\n\n    " + SUM)
-s6 = root("V2Success.dc.html")
+exec(open("success.py", encoding="utf-8").read())
+s6 = SUCCESS
 
 # hub variants from V2HomeReady
 P_OPEN = '<div style="display: flex; align-items: center; gap: 12px; padding: 12px 16px; border-bottom: 1px solid #E6E8EB">\n        <div style="font-size: 15px; width: 72px; flex-shrink: 0">付款方式</div>'
@@ -188,7 +189,7 @@ f10 = root("FtNoticeDone.dc.html")
 f10, k = re.subn(r'\s*<div style="display: flex; flex-direction: column; gap: 8px">\s*<div style="font-size: 13px; font-weight: 500; color: #5B6470">送出前確認</div>.*?\[折後價\]</div>\s*</div>\s*</div>', '', f10, flags=re.S); assert k == 1
 f10, k = re.subn(r'<a href="FtSuccess\.dc\.html"[^>]*>我已閱讀，送出訂單・\[折後價\]</a>\s*<a href="FtHomeReady\.dc\.html"[^>]*>返回修改</a>', lambda m: CTA.format("我已閱讀並同意"), f10); assert k == 1
 f10c = s5
-f11 = root("FtSuccess.dc.html")
+f11 = SUCCESS
 
 # ---------- layout ----------
 W, H = 7612, 5724
@@ -201,7 +202,7 @@ laneA = [("1 快遞首頁（剛進入）", s1, "取件與寄件人已帶入，�
          ("3 地址詳情頁（送件）", s3, "參照 Lalamove，合併需求方 v2 的「地圖＋配送資訊」：地圖在頁首，可拖曳微調位置，地址列可修改；下方填樓層、收件人（必填）與備註，取消配送資訊頁。「加入最愛」放在欄位最後，按確認時地址、樓層與收件人一起存進最愛。"),
          ("4 快遞首頁（已填完）", s4, "送件地址設定完整後，付款與發票才出現，帶入上次的設定。主按鈕變成「送出訂單・金額」。"),
          ("5 確認彈窗", s5, "列出地址與聯絡人、配送時間、付款、發票與金額。取件與送件下面各列出寄件人、收件人，地址填反時比較容易發現。老用戶已讀過運送須知，這裡不再放同意文字。「返回修改」回到第 4 頁。"),
-         ("6 送出成功", s6, "寫明免費取消的期限並給取消入口。")]
+         ("6 送出成功", s6, "沿用現行的送出成功頁，只改成灰階，不在這次的設計範圍。")]
 laneB = [("1 快遞首頁（第一次進入）", f1, "沒有最愛與歷程，取件只帶入目前位置。主按鈕直接寫「填寫送件地址」；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。"),
          ("2 地址輸入頁（沒有歷程）", f2, "沒有歷程與最愛，直接列出搜尋結果。"),
          ("3 地址詳情頁（送件）", f3, "與 A 列第 3 頁相同的版型。收件人只能手動填或從通訊錄帶入；加入最愛後，下次出現在快遞首頁的最愛與歷程。"),
