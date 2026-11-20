@@ -95,20 +95,7 @@ c5 = (ROOT + hdr("設定地址") + inputs(field("pick", "取件", value="[選好
       + '<div style="flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">' + MAPBTN + results()
       + '<div style="font-size: 13px; color: #5B6470">選好送件地址後，進入地址詳情頁。</div></div></div>')
 # ---------- lane A side page: pickup detail with editable sender ----------
-pk = root("AddressDetail.dc.html")
-for a_, b_ in [('<div style="font-size: 17px; font-weight: 700">送件地址詳情</div>', '<div style="font-size: 17px; font-weight: 700">取件地址詳情</div>'),
-               ('box-sizing: border-box; border: 2px solid #1F2328; flex-shrink: 0"></div>', 'border-radius: 5px; background: #1F2328; flex-shrink: 0"></div>'),
-               ('>送件</div>', '>取件</div>'),
-               ('[選好的送件地址]', '[取件地址]'),
-               ('>收件人</div>', '>寄件人</div>'),
-               ('必填或選填，待確認', '可改成其他人的聯絡資料'),
-               ('placeholder="收件人姓名"', 'value="[會員姓名]"'),
-               ('placeholder="收件人電話"', 'value="[會員電話]"'),
-               ('placeholder="給司機的說明"', 'placeholder="給司機的取件說明"')]:
-    pk = rep(pk, a_, b_)
-pk = rep(pk, ">完成</a>", ">確認</a>")
-pk, k = re.subn(r'<div style="display: inline-flex[^"]*">Q1</div>', lambda m: CH_OUT.format("已帶入會員資料"), pk); assert k == 1
-pk, k = re.subn(r'\s*<div style="font-size: 12px; color: #5B6470">目前未開放代收代墊</div>', '', pk); assert k == 1
+pk = detail("pick", "[取件地址]", "member")
 pkC = rep(pk, "[取件地址]", "[選好的取件地址]")
 c6 = f3
 c7 = rep(f4, "[目前位置]", "[選好的取件地址]")

@@ -48,18 +48,8 @@ s1, k = re.subn(r'(\s*</div>\s*<div style="flex-shrink: 0; background: #FFFFFF; 
 s1_base = s1
 s1 = swapify(s1)
 s2 = noswap(root("AddressInput.dc.html"))
-SAVE_BTN = ('<button type="button" aria-pressed="false" style="align-self: flex-start; margin-top: -8px; min-height: 44px; border: 0; background: none; padding: 0 4px; font: inherit; font-size: 14px; font-weight: 500; color: #1F2328; display: flex; align-items: center; gap: 6px">'
-            '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8-4.2-4.1 5.9-.9z"></path></svg>'
-            '加入最愛</button>\n\n    ')
-def add_save(body):
-    old = '修改</a>\n    </div>\n\n    '
-    assert body.count(old) == 1
-    return body.replace(old, old + SAVE_BTN)
-Q1_RE = r'<div style="display: inline-flex[^"]*">Q1</div>\s*<div style="font-size: 12px; color: #5B6470">必填或選填，待確認</div>'
-def required(h):
-    h, k = re.subn(Q1_RE, '<div style="font-size: 12px; color: #5B6470">必填</div>', h); assert k == 1
-    return h
-s3 = rep(required(add_save(root("AddressDetail.dc.html"))), ">完成</a>", ">確認</a>")
+exec(open("detail.py", encoding="utf-8").read())
+s3 = detail("drop", "[選好的送件地址]")
 V2R = root("V2HomeReady.dc.html")
 V2R, k = re.subn(r'<a href="#limits"[^>]*>物品的材積與重量限制</a>', lambda m: LIMIT_BOX, V2R); assert k == 1
 V2R, k = re.subn(r'\s*<div style="display: inline-flex[^"]*">Q5</div>', '', V2R); assert k == 1
@@ -130,7 +120,7 @@ f1 = rep(f1, ">繼續</a>", ">填寫送件地址</a>")
 f1 = rep(f1, '<a href="#info"', LIMIT_BOX + '\n\n    <a href="#info"')
 f1 = swapify(f1)
 f2 = noswap(root("FtAddressInput.dc.html"))
-f3 = rep(required(add_save(root("FtAddressDetail.dc.html"))), ">完成</a>", ">確認</a>")
+f3 = s3
 f4 = hub("missing", "missing")
 f4e = hub("error", "error")
 f5 = '''<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFFFFF; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #1F2328; display: flex; flex-direction: column">
@@ -208,13 +198,13 @@ def L(i): return X0 + i * PITCH
 
 laneA = [("1 快遞首頁（剛進入）", s1, "取件與寄件人已帶入，地址卡片右側有對調鈕。主按鈕直接寫「填寫送件地址」，不寫還缺幾項；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。Q2"),
          ("2 地址輸入頁", s2, "兩個地址同頁，這一頁只選地址，不放對調鈕。"),
-         ("3 地址詳情頁（送件）", s3, "收件人併進這一頁，取消配送資訊頁；姓名與電話必填。地址下方可「加入最愛」，按確認時地址、樓層與收件人一起存進最愛。"),
+         ("3 地址詳情頁（送件）", s3, "參照 Lalamove，合併需求方 v2 的「地圖＋配送資訊」：地圖在頁首，可拖曳微調位置，地址列可修改；下方填樓層、收件人（必填）與備註，取消配送資訊頁。「加入最愛」放在欄位最後，按確認時地址、樓層與收件人一起存進最愛。"),
          ("4 快遞首頁（已填完）", s4, "送件地址設定完整後，付款與發票才出現，帶入上次的設定。主按鈕變成「送出訂單・金額」。"),
          ("5 確認彈窗", s5, "列出地址與聯絡人、配送時間、付款、發票與金額。取件與送件下面各列出寄件人、收件人，地址填反時比較容易發現。老用戶已讀過運送須知，這裡不再放同意文字。「返回修改」回到第 4 頁。"),
          ("6 送出成功", s6, "寫明免費取消的期限並給取消入口。")]
 laneB = [("1 快遞首頁（第一次進入）", f1, "沒有最愛與歷程，取件只帶入目前位置。主按鈕直接寫「填寫送件地址」；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。"),
          ("2 地址輸入頁（沒有歷程）", f2, "沒有歷程與最愛，直接列出搜尋結果。"),
-         ("3 地址詳情頁（送件）", f3, "收件人只能手動填或從通訊錄帶入，姓名與電話必填。地址下方可「加入最愛」，下次出現在快遞首頁的最愛與歷程。"),
+         ("3 地址詳情頁（送件）", f3, "與 A 列第 3 頁相同的版型。收件人只能手動填或從通訊錄帶入；加入最愛後，下次出現在快遞首頁的最愛與歷程。"),
          ("4 快遞首頁（還沒綁卡）", f4, "送件地址設定完整後，付款與發票才出現，標「尚未綁定」「尚未設定」。主按鈕是「送出訂單・金額」，不會帶去綁卡或發票。註冊時填過信箱的會員，發票會帶入「個人・會員信箱」，不會缺發票。"),
          ("5 快遞首頁（按送出後提示）", f4e, "資料不全時按送出訂單不換頁，在付款與發票欄位下方出現紅字；使用者自己點欄位去補。"),
          ("6 付款與優惠（未綁定）", f5, "沿用現行的付款與優惠頁，從付款欄位進入。按「新增綁定支付」走現行綁卡流程（畫面待補）；完成、放棄或失敗都回到這一頁。沒綁卡就返回，回到第 5 頁，紅字仍在。"),

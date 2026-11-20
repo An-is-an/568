@@ -21,11 +21,7 @@ d2 = rep(d2, ">填寫送件地址</a>", ">填寫取件地址</a>")
 d3 = (ROOT + hdr("設定地址") + inputs(field("pick", "取件", value="[輸入中的取件地址]", focus=True), field("drop", "送件", value="[目前位置或上次地址]"))
       + '<div style="flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px">' + MAPBTN + results()
       + '<div style="font-size: 13px; color: #5B6470">選好取件地址後，進入取件地址詳情。</div></div></div>')
-d4 = rep(pk, "[取件地址]", "[選好的取件地址]")
-d4, k = re.subn(r"\s*" + re.escape(CH_OUT.format("已帶入會員資料")), "", d4); assert k == 1
-d4 = rep(d4, "可改成其他人的聯絡資料", "必填")
-d4 = rep(d4, 'value="[會員姓名]"', 'placeholder="寄件人姓名"')
-d4 = rep(d4, 'value="[會員電話]"', 'placeholder="寄件人電話"')
+d4 = detail("pick", "[選好的取件地址]")
 d5 = V2R
 for a_, b_ in [("寄件人 [會員姓名]・[會員電話]", "寄件人 [姓名]・[電話]"), ("收件人 [姓名]・[電話]", "收件人 [會員姓名]・[會員電話]"),
                ("[取件地址與樓層門牌]", "[選好的取件地址]"), ("[送件地址與樓層門牌]", "[目前位置或上次地址]")]:
