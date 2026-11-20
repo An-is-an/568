@@ -97,18 +97,27 @@ s1_swap = s1
 e3 = entry(3)
 e2 = entry(2)
 ec = entry(3, code=True)
-filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + ad(3)))
+_TAG = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="flex-shrink: 0"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.5"></circle></svg>'
+def promo_row(expanded):
+    word, d = ("收起", "M6 15l6-6 6 6") if expanded else ("展開", "M6 9l6 6 6-6")
+    return (f'<button type="button" aria-expanded="{"true" if expanded else "false"}" style="flex-shrink: 0; min-height: 44px; border: 0; background: none; padding: 0 4px; font: inherit; font-size: 14px; color: #3D444D; display: flex; align-items: center; gap: 8px">'
+            + _TAG + '<span style="flex: 1; text-align: left">合作優惠 3 則</span>'
+            f'<span>{word}</span><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0"><path d="{d}"></path></svg></button>')
+filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(False)))
+opened = rep(clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(True) + "\n    " + ad(3))), CONTENT + '; overflow: hidden', CONTENT + '; overflow: hidden; justify-content: flex-end')
 
 items = [
     ("1 現行做法", CURRENT,
      "照現行畫面畫成灰階。1:4 的輪播 banner 在卡片下方，有頁數點點；高度不到 90，圖上的字很小。看起來像能點，實際點了沒有反應。"),
     ("2 入口：3:1（建議）", e3,
      "兩個地址還沒填完，是吸引下單的時刻：banner 放在物品限制下方（物品限制規則不放在廣告下方）。3:1，約 330 × 110。一次一張、可手動滑，右側露出下一張；不自動播放，每次進入輪流換第一張，讓各車隊公平曝光。「優惠」標籤由 App 疊上。在 iPhone SE 這類小螢幕，banner 會被裁到畫面下緣，要往下滑才看得完整。"),
-    ("3 地址填完：banner 移到下方", filled,
-     "送件地址填完後，付款與發票出現，banner 移到物品限制下方、遠離主按鈕，不完全藏起來；這個螢幕高度剛好放得下，小螢幕要往下滑才看得到。同一張圖、同一個尺寸，只換位置，車隊不必做兩份素材。運費與主按鈕的折後價是計價規則，與 banner 無關。"),
-    ("4 比較：入口改 2:1", e2,
+    ("3 地址填完：收成一行", filled,
+     "送件地址填完後，付款與發票出現，banner 收成物品限制下方的一行「合作優惠 3 則」，不顯示圖片，送出前不搶注意力。不完全藏起來：內容是序號時，使用者還找得到。運費與主按鈕的折後價是計價規則，與 banner 無關。"),
+    ("4 點「展開」", opened,
+     "在原地展開同一組 banner，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。同一張圖、同一個尺寸，車隊不必做兩份素材。按「收起」回到第 3 頁。"),
+    ("5 比較：入口改 2:1", e2,
      "同第 2 頁，比例改 2:1，約 330 × 165，比兩個地址欄還高，入口時搶過「填地址」；小螢幕上大半會在畫面外。給需求方看「更大」的樣子。"),
-    ("5 內容是序號優惠時", ec,
+    ("6 內容是序號優惠時", ec,
      "車隊上架時有選填序號文字，banner 下方才多一列序號與「複製序號」；沒填就只顯示圖片。圖片本身仍不能點。複製後到「付款與優惠」兌換（兌換畫面待補）。"),
 ]
 
@@ -133,12 +142,17 @@ extra.append(f'<svg role="img" aria-label="從入口到地址填完：填完送�
              f'<defs><marker id="dc-arrow-head-filled-ad1" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" style="stroke: none; fill: #5B6470"></path></marker></defs>'
              f'<path d="M 0 4 L {x2-x1-4} 4" marker-end="url(#dc-arrow-head-filled-ad1)"></path></svg>')
 lab(x1 + 8, ay - 48, 134, "填完送件地址", size=15, lh=20)
+x1, x2 = X0 + 2 * PITCH + SW, X0 + 3 * PITCH - 1
+extra.append(f'<svg role="img" aria-label="從地址填完到展開：點合作優惠" width="{x2-x1}" height="8" viewBox="0 0 {x2-x1} 8" style="position: absolute; left: {x1}px; top: {ay-4}px; overflow: visible; fill: none; stroke: #5B6470; stroke-width: 2; stroke-linecap: round">'
+             f'<defs><marker id="dc-arrow-head-filled-ad2" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" style="stroke: none; fill: #5B6470"></path></marker></defs>'
+             f'<path d="M 0 4 L {x2-x1-4} 4" marker-end="url(#dc-arrow-head-filled-ad2)"></path></svg>')
+lab(x1 + 8, ay - 48, 134, "點「展開」", size=15, lh=20)
 # separators: current | proposal | comparison
-for k in (1, 3):
+for k in (1, 4):
     sx = X0 + k * PITCH - (PITCH - SW) // 2
     extra.append(f'<div aria-hidden="true" style="position: absolute; left: {sx}px; top: {Y - 60}px; width: 0; height: {SH + 260}px; border-left: 2px dashed #D5D8DD"></div>')
 lab(X0, 96, W - 2 * X0, "廣告版位｜快遞首頁的 banner：比例與位置的比較", size=36, lh=48, color="#1F2328", weight=700)
-lab(X0, 148, W - 2 * X0, "banner 由合作車隊自行上架、不能點，內容不一定是序號優惠。版位規則不假設內容：入口放大、地址填完移到下方、不自動播放、只收靜態圖。以「我的版本」A 列第 1、4 頁為底。", size=18, lh=26, color="#5B6470")
+lab(X0, 148, W - 2 * X0, "banner 由合作車隊自行上架、不能點，內容不一定是序號優惠。版位規則不假設內容：入口放大、地址填完收成一行、不自動播放、只收靜態圖。以「我的版本」A 列第 1、4 頁為底。", size=18, lh=26, color="#5B6470")
 
 html = f'''<!doctype html>
 <html lang="zh-Hant">
