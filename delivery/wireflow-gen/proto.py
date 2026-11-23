@@ -142,6 +142,32 @@ renderVals() {{
 </html>
 '''
 import os
+def swap_toggle(b):
+    """homes with both addresses: the swap button exchanges the two addresses in place; contacts follow
+    their address (member data moves to the recipient). Drawn as two copies of the address card."""
+    i = b.find(CARD_OPEN)
+    if i < 0 or '<button type="button" aria-label="取件與送件地址對調"' not in b:
+        return b, None
+    j = _close(b, i, "div")
+    card = b[i:j]
+    addr = re.findall(r'<div style="font-size: 16px; font-weight: 500">([^<]*)</div>', card)
+    snd = re.search(r'寄件人 ([^<]*)<', card); rcv = re.search(r'收件人 ([^<]*)<', card)
+    if len(addr) < 2 or not (snd and rcv):
+        return b, None          # one address still missing: nothing to exchange here
+    pa, da = addr[0], addr[1]
+    alt = card
+    for a_, b_ in ((pa, "\x00P"), (da, "\x00D"), ("寄件人 " + snd.group(1), "\x00S"), ("收件人 " + rcv.group(1), "\x00R")):
+        alt = alt.replace(a_, b_, 1)
+    alt = (alt.replace("\x00P", da).replace("\x00D", pa)
+              .replace("\x00S", "寄件人 " + rcv.group(1)).replace("\x00R", "收件人 " + snd.group(1)))
+    on = '<button type="button" aria-label="取件與送件地址對調" onClick="{{toggleSwap}}"'
+    card, alt = (c.replace('<button type="button" aria-label="取件與送件地址對調"', on, 1) for c in (card, alt))
+    b = (b[:i] + '<sc-if value="{{plain}}" hint-placeholder-val="{{ true }}">' + card + '</sc-if>'
+         '<sc-if value="{{swapped}}" hint-placeholder-val="{{ false }}">' + alt + '</sc-if>' + b[j:])
+    js = ("const s = this.state || {};\n"
+          "return { plain: !s.swapped, swapped: !!s.swapped, toggleSwap: () => this.setState({ swapped: !(this.state || {}).swapped }) };")
+    return b, js
+
 def contact_fill(b):
     """favorites toggle and contact fields on address detail: '填入我的資料' fills the member, the contacts icon fills a contact,
     both overwrite name and phone together; typing still works (controlled inputs)."""
@@ -180,6 +206,10 @@ for key, title, body, links in screens:
         assert tgt in keys, tgt
         b = link(b, needle, F(tgt), **kw)
     b, vals = contact_fill(b)
+    b, sv = swap_toggle(b)
+    if sv:
+        assert vals == "return {};", key
+        vals = sv
     open(f"{P}/{F(key)}", "w", encoding="utf-8").write(SKEL.format(title=title, body=b, vals=vals))
     if key == "Menu":   # left of the rows, beside row A
         boards[F(key)] = {"h": 844, "w": 390, "x": -560, "y": 0, "is_interactive": True, "page": "proto", "title": title}
