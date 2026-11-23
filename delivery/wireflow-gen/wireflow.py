@@ -4,7 +4,7 @@ P = sys.argv[1]  # project dir
 def root(name):
     s = open(f"{P}/{name}", encoding="utf-8").read()
     # main button copy does not depend on which address is missing
-    s = s.replace(">填寫送件地址</a>", ">填寫配送地址</a>").replace("填完送件地址後顯示", "填完地址後顯示")
+    s = s.replace(">填寫送件地址</a>", ">填寫配送地址</a>").replace("填完送件地址後顯示", "填完配送地址後顯示")
     a = s.index("</helmet>") + len("</helmet>")
     b = s.index("</x-dc>")
     return s[a:b].strip()

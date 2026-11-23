@@ -61,7 +61,7 @@ c1 = (ROOT + '''
     <a href="#info" style="font-size: 13px; font-weight: 500; min-height: 44px; display: flex; align-items: center">計費方式與服務說明</a>
   </div>
   <div style="flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #D5D8DD; padding: 12px 16px 24px; display: flex; flex-direction: column; gap: 12px">
-    <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 15px">運費</div><div style="font-size: 14px; color: #5B6470">填完地址後顯示</div></div>
+    <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 15px">運費</div><div style="font-size: 14px; color: #5B6470">填完配送地址後顯示</div></div>
     ''' + CTA.format("填寫配送地址") + '''
   </div>
 </div>''')
