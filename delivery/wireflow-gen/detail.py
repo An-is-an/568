@@ -65,7 +65,7 @@ def detail(kind, addr, contact="empty"):
     </div>
     <textarea aria-label="備註，選填" placeholder="{note}（選填）" style="height: 64px; box-sizing: border-box; border: 1px solid #D5D8DD; border-radius: 8px; background: #FFFFFF; font: inherit; font-size: 15px; color: #1F2328; padding: 10px 12px; resize: none"></textarea>
     <div style="font-size: 12px; color: #5B6470; margin-top: -4px">目前未開放代收代墊</div>
-    {"" if pick else _STAR}
+    {_STAR}
   </div>
   <div style="flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #E6E8EB; padding: 12px 16px 24px">
     {CTA.format("確認")}
