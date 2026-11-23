@@ -48,7 +48,7 @@ def home_header(h):
         out.append(h[pos:m.start()]); out.append(HERO)
         n = _AFTER_HERO_RE.match(h, len(h[:m.end()]) + (len(h[m.end():]) - len(h[m.end():].lstrip())))
         assert n, "content block must follow the home header"
-        out.append(n.group(1) + "position: relative; margin-top: -48px; " + n.group(2)); pos = n.end()
+        out.append(n.group(1) + "position: relative; margin-top: -64px; " + n.group(2)); pos = n.end()
     out.append(h[pos:])
     # no "配送地址" label above the card (designer 2026-11-23: too much text)
     return re.sub(r'<div style="font-size: 13px; font-weight: 500; color: #5B6470">配送地址</div>\s*', "", "".join(out))
