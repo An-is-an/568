@@ -120,7 +120,7 @@ a{{color:#1F2328}}a:hover{{color:#000000}}
 <script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":390,"height":844}}}}'>
 class Component extends DCLogic {{
 renderVals() {{
-return {{}};
+{vals}
 }}
 }}
 </script>
@@ -128,6 +128,27 @@ return {{}};
 </html>
 '''
 import os
+def contact_fill(b):
+    """contact fields on address detail: '填入我的資料' fills the member, the contacts icon fills a contact,
+    both overwrite name and phone together; typing still works (controlled inputs)."""
+    if ">填入我的資料<" not in b:
+        return b, "return {};"
+    init = {}
+    for kind, suffix, hole, handler in (("text", "姓名", "cname", "onName"), ("tel", "手機號碼", "cphone", "onPhone")):
+        m = re.search(rf'<input type="{kind}" aria-label="([^"]*{suffix})" (value|placeholder)="([^"]*)"', b)
+        assert m, kind
+        label, attr, val = m.groups()
+        init[hole] = val if attr == "value" else ""
+        b = b[:m.start()] + f'<input type="{kind}" aria-label="{label}" placeholder="{label}" value="{{{{{hole}}}}}" onChange="{{{{{handler}}}}}"' + b[m.end():]
+    b = re.sub(r'<button type="button"( style="[^"]*")>填入我的資料</button>', r'<button type="button" onClick="{{fillMe}}"\1>填入我的資料</button>', b, count=1)
+    b = b.replace('<button type="button" aria-label="從通訊錄帶入姓名與電話"', '<button type="button" aria-label="從通訊錄帶入姓名與電話" onClick="{{fillContact}}"', 1)
+    assert "{{fillMe}}" in b and "{{fillContact}}" in b
+    js = ("const s = this.state || {};\n"
+          f"return {{ cname: s.cname ?? {json.dumps(init['cname'], ensure_ascii=False)}, cphone: s.cphone ?? {json.dumps(init['cphone'], ensure_ascii=False)},\n"
+          "  onName: (e) => this.setState({ cname: e.target.value }), onPhone: (e) => this.setState({ cphone: e.target.value }),\n"
+          "  fillMe: () => this.setState({ cname: '[會員姓名]', cphone: '[會員電話]' }),\n"
+          "  fillContact: () => this.setState({ cname: '[通訊錄的姓名]', cphone: '[通訊錄的電話]' }) };")
+    return b, js
 keys = {k for k, *_ in screens}
 rows = {"A": 0, "D": 1, "B": 2, "C": 3}
 order_in_row = {}
@@ -137,7 +158,8 @@ for key, title, body, links in screens:
     for needle, tgt, kw in links:
         assert tgt in keys, tgt
         b = link(b, needle, F(tgt), **kw)
-    open(f"{P}/{F(key)}", "w", encoding="utf-8").write(SKEL.format(title=title, body=b))
+    b, vals = contact_fill(b)
+    open(f"{P}/{F(key)}", "w", encoding="utf-8").write(SKEL.format(title=title, body=b, vals=vals))
     r = "A" if key == "AP" else key[0]
     n = order_in_row.get(r, 0); order_in_row[r] = n + 1
     boards[F(key)] = {"h": 844, "w": 390, "x": n * 470, "y": rows[r] * 1300, "is_interactive": True, "page": "proto", "title": title}
