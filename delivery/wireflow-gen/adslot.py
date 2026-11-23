@@ -107,7 +107,7 @@ def promo_row(expanded):
 filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(False)))
 def promo_open():
     # expanded: the banners sit inside the same gray block as the header
-    w = 306; h = round(w / 3)
+    w = 280; h = 112  # 5:2, narrower and taller than 3:1 (designer 2026-11-23)
     def img(label):
         return (f'<div style="flex-shrink: 0; width: {w}px; position: relative; height: {h}px; box-sizing: border-box; background: #F4F4F5; border: 1px solid #C9CDD3; border-radius: 10px; '
                 f'display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5B6470">{label}'
@@ -118,8 +118,8 @@ def promo_open():
             '<span style="width: 4px; height: 4px; border-radius: 2px; background: #A3A9B1"></span></div>')
     head = promo_row(True).replace("flex-shrink: 0; min-height: 48px; border: 0; border-radius: 10px; background: #E6E8EB;", "flex-shrink: 0; min-height: 48px; border: 0; background: none;")
     return ('<section aria-label="快遞專屬優惠，第 1 張，共 3 張" style="flex-shrink: 0; background: #E6E8EB; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column">'
-            + head + '<div style="padding: 0 0 12px 12px; display: flex; flex-direction: column; gap: 8px"><div style="display: flex; gap: 8px">'
-            + img("[車隊上傳的優惠圖 3:1]") + img("[第 2 張]") + '</div>' + dots + '</div></section>')
+            + head + '<div style="padding: 0 0 12px 12px"><div style="display: flex; gap: 8px">'
+            + img("[車隊上傳的優惠圖 5:2]") + img("[第 2 張]") + '</div></div></section>')
 opened = rep(clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_open())), CONTENT + '; overflow: hidden', CONTENT + '; overflow: hidden; justify-content: flex-end')
 
 items = [
@@ -130,7 +130,7 @@ items = [
     ("3 地址填完：收成一行", filled,
      "送件地址填完後，付款與發票出現，banner 收成物品限制下方的一條灰底「快遞專屬優惠」，不顯示圖片、不寫張數，右側只有展開圖示，送出前不搶注意力。不完全藏起來：內容是序號時，使用者還找得到。運費與主按鈕的折後價是計價規則，與 banner 無關。"),
     ("4 點開「快遞專屬優惠」", opened,
-     "在原地展開同一組 banner，banner 放在同一個灰底區塊裡，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。同一張圖、同一個尺寸，車隊不必做兩份素材。再點一次（收起圖示）回到第 3 頁。"),
+     "在原地展開同一組 banner，banner 放在同一個灰底區塊裡，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。廣告改為 5:2（約 280 × 112），比 3:1 窄一點、高一點；不放頁數點點，靠右側露出的下一張暗示可滑。入口目前仍是 3:1，兩處比例要統一，車隊才不必做兩份素材（待定）。再點一次（收起圖示）回到第 3 頁。"),
     ("5 比較：入口改 2:1", e2,
      "同第 2 頁，比例改 2:1，約 330 × 165，比兩個地址欄還高，入口時搶過「填地址」；小螢幕上大半會在畫面外。給需求方看「更大」的樣子。"),
     ("6 內容是序號優惠時", ec,
