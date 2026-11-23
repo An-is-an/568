@@ -31,17 +31,26 @@ _SHEET_HDR = '<div style="height: 56px; background: #FFFFFF; border-bottom: 1px 
 _BACK_BTN = ('<button type="button" aria-label="返回" style="width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328">'
              '<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button>')
 _SQ = "position: absolute; top: 8px; width: 44px; height: 44px; border: 0; border-radius: 10px; background: #FFFFFF; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"
-HERO = ('<div style="flex-shrink: 0; position: relative; height: 120px; background: #E6E8EB">'
-        '<div role="img" aria-label="現行插圖：機車與包裹" style="position: absolute; right: 64px; top: 10px; width: 120px; height: 100px; box-sizing: border-box; border: 1px dashed #A3A9B1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #5B6470">[現行插圖]</div>'
+HERO = ('<div style="flex-shrink: 0; position: relative; height: 184px; background: #E6E8EB">'
+        '<div role="img" aria-label="現行插圖：機車與包裹" style="position: absolute; right: 16px; top: 60px; width: 140px; height: 104px; box-sizing: border-box; border: 1px dashed #A3A9B1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #5B6470">[現行插圖]</div>'
         + _BACK_BTN.replace('style="width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"', f'style="{_SQ}; left: 12px"')
         + ORDER_BTN.replace('style="margin-left: auto; position: relative; width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"', f'style="{_SQ}; right: 12px"')
         + '<div style="position: absolute; left: 16px; top: 60px; display: flex; flex-direction: column; gap: 2px">'
           '<div style="font-size: 22px; font-weight: 700">即時快遞</div>'
           '<div style="font-size: 14px; font-weight: 500">機車快捷投遞，準時抵達！</div></div></div>')
 _BAR_RE = re.compile(r'<div style="height: 56px;[^"]*">\s*(?:<button type="button" aria-label="返回".*?</button>\s*)?<div style="font-size: 17px; font-weight: 700">即時快遞</div>\s*</div>', re.S)
+_AFTER_HERO_RE = re.compile(r'(<div style=")((?:flex: 1; min-height: 0; )?padding: 16px; display: flex; flex-direction: column; gap: 12px)')
 def home_header(h):
-    # the current app's header: back and order history float as white squares on the illustration
-    return _BAR_RE.sub(lambda m: HERO, h)
+    # the current app's header: back and order history float as white squares on the illustration,
+    # and the address section is pulled up so the card overlaps the illustration's lower edge
+    out, pos = [], 0
+    for m in _BAR_RE.finditer(h):
+        out.append(h[pos:m.start()]); out.append(HERO)
+        n = _AFTER_HERO_RE.match(h, len(h[:m.end()]) + (len(h[m.end():]) - len(h[m.end():].lstrip())))
+        assert n, "content block must follow the home header"
+        out.append(n.group(1) + "position: relative; margin-top: -79px; " + n.group(2)); pos = n.end()
+    out.append(h[pos:])
+    return "".join(out)
 
 # ---------- screens ----------
 SWAP_SVG = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16"></path><path d="M4 8l4-4 4 4"></path><path d="M16 20V4"></path><path d="M12 16l4 4 4-4"></path></svg>'
