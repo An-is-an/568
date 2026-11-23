@@ -1,0 +1,144 @@
+# ---------- clickable prototype of the designer's version ----------
+# Usage: python3 -I proto.py <project dir>  (same downloaded artboards as wireflow.py)
+# Builds every screen exactly as wireflow.py does (it also rewrites Wireflow.dc.html, unchanged),
+# then writes one artboard per screen (Pr*.dc.html, next to the others) with links between them,
+# and prints the canvas.json entries for the "Prototype" page as JSON.
+import re, sys, io, json, contextlib
+P = sys.argv[1]
+with contextlib.redirect_stdout(io.StringIO()):
+    exec(open("wireflow.py", encoding="utf-8").read())
+
+def _close(body, start, tag):
+    """index just past the element that opens at `start`, honouring nesting of the same tag"""
+    depth, i = 0, start
+    pat = re.compile(rf'<{tag}\b|</{tag}>')
+    for m in pat.finditer(body, start):
+        depth += 1 if m.group(0) != f'</{tag}>' else -1
+        if depth == 0:
+            return m.end()
+    raise AssertionError(f"unclosed <{tag}> at {start}")
+
+def link(body, needle, target, tag=None, hint=None, nth=0):
+    """make the element that contains `needle` go to `target`.
+    tag=None: nearest enclosing <a> or <button>; tag='div' with a style `hint`: that row."""
+    idx = -1
+    for _ in range(nth + 1):
+        idx = body.index(needle, idx + 1)
+    tags = [tag] if tag else ["a", "button"]
+    best = None
+    for t in tags:
+        for m in re.finditer(rf'<{t}\b[^>]*>', body):
+            if m.start() > idx:
+                break
+            if hint and hint not in m.group(0):
+                continue
+            if m.start() <= idx < _close(body, m.start(), t) and (best is None or m.start() > best[1]):
+                best = (t, m.start(), m.end())
+    assert best, (needle, target)
+    t, s, e = best
+    end = _close(body, s, t)
+    open_tag = body[s:e]
+    if t == "a":
+        new_open = re.sub(r'href="[^"]*"', f'href="{target}"', open_tag, count=1)
+        close_len = len("</a>")
+        new_close = "</a>"
+    else:
+        new_open = re.sub(r'^<' + t, f'<a href="{target}"', open_tag)
+        new_open = re.sub(r'\s(type="button"|disabled|aria-pressed="[^"]*"|aria-expanded="[^"]*")', '', new_open)
+        new_open = new_open.replace('style="', 'style="text-decoration: none; color: inherit; cursor: pointer; ', 1)
+        close_len = len(f"</{t}>")
+        new_close = "</a>"
+    return body[:s] + new_open + body[e:end - close_len] + new_close + body[end:]
+
+ROW = "padding: 12px 16px; display: flex; flex-direction: column; gap: 6px"   # hub() payment / invoice rows
+RES = ["[搜尋結果 1 的名稱]", "[搜尋結果 2 的名稱]", "[搜尋結果 3 的名稱]"]
+
+def prep(b):
+    b = hscroll(home_header(b))
+    return re.sub(r'href="[^"#]*\.dc\.html"', 'href="#"', b)   # never jump into the older discussion boards
+
+A, D, B, C = laneA, laneD, laneB, laneC
+F = lambda k: f"Pr{k}.dc.html"
+# (key, title, body, [(needle, target_key, kwargs)])
+screens = [
+ ("A1", "A1 快遞首頁（剛進入）", A[0][1], [("[目前位置或上次地址]", "AP", {}), ("要送到哪裡？", "A2", {}), (">填寫地址<", "A2", {}),
+     ("[最愛地址 1]", "A4", {}), ("[歷程地址 1]", "A4", {}), ("[歷程地址 2]", "A4", {}), ("[歷程地址 3]", "A3", {}),
+     ('aria-label="取件與送件地址對調"', "D2", {})]),
+ ("A2", "A2 地址輸入頁", A[1][1], [(r, "A3", {}) for r in RES] + [('aria-label="返回快遞首頁"', "A1", {})]),
+ ("A3", "A3 送件地址詳情", A[2][1], [(">確認<", "A4", {}), ('aria-label="返回地址輸入頁"', "A2", {})]),
+ ("A4", "A4 快遞首頁（已填完）", A[3][1], [("[取件地址與樓層門牌]", "AP", {}), ("[送件地址與樓層門牌]", "A3", {}), ("送出訂單・[折後價]", "A5", {})]),
+ ("A5", "A5 確認彈窗", A[4][1], [(">確認送出<", "A6", {}), ("返回修改", "A4", {})]),
+ ("A6", "A6 送出成功", A[5][1], [('aria-label="關閉"', "A1", {})]),
+ ("AP", "A 取件地址詳情（從快遞首頁點取件）", pk, [(">確認<", "A4", {}), ('aria-label="返回地址輸入頁"', "A4", {})]),
+ ("D2", "A2 對調後的快遞首頁", D[1][1], [("要從哪裡寄？", "D3", {}), (">填寫地址<", "D3", {}), ('aria-label="取件與送件地址對調"', "A1", {})]),
+ ("D3", "A2 地址輸入頁（填取件）", D[2][1], [(r, "D4", {}) for r in RES] + [('aria-label="返回"', "D2", {})]),
+ ("D4", "A2 取件地址詳情（寄件人空白）", D[3][1], [(">確認<", "D5", {}), ('aria-label="返回地址輸入頁"', "D3", {})]),
+ ("D5", "A2 快遞首頁（填完地址）", D[4][1], [("送出訂單・[折後價]", "A5", {})]),
+ ("B1", "B1 快遞首頁（第一次進入）", B[0][1], [("要送到哪裡？", "B2", {}), (">填寫地址<", "B2", {})]),
+ ("B2", "B2 地址輸入頁（沒有歷程）", B[1][1], [(r, "B3", {}) for r in RES] + [('aria-label="返回快遞首頁"', "B1", {})]),
+ ("B3", "B3 送件地址詳情", B[2][1], [(">確認<", "B4", {}), ('aria-label="返回地址輸入頁"', "B2", {})]),
+ ("B4", "B4 快遞首頁（還沒綁卡）", B[3][1], [("送出訂單・[折後價]", "B5", {}), (">付款方式<", "B6", {"tag": "div", "hint": ROW})]),
+ ("B5", "B5 快遞首頁（按送出後提示）", B[4][1], [(">付款方式<", "B6", {"tag": "div", "hint": ROW})]),
+ ("B6", "B6 付款與優惠（未綁定）", B[5][1], [("新增綁定支付", "B7", {}), ('aria-label="返回快遞首頁"', "B5", {})]),
+ ("B7", "B7 付款與優惠（綁完卡）", B[6][1], [('aria-label="返回快遞首頁"', "B8", {})]),
+ ("B8", "B8 快遞首頁（綁完卡）", B[7][1], [(">發票資訊<", "B9", {"tag": "div", "hint": ROW})]),
+ ("B9", "B9 發票資訊", B[8][1], [("儲存變更", "B10", {}), ('aria-label="返回快遞首頁"', "B8", {})]),
+ ("B10", "B10 快遞首頁（都設定好）", B[9][1], [("送出訂單・[折後價]", "B11", {})]),
+ ("B11", "B11 運送須知（尚未讀完）", B[10][1], [("繼續往下閱讀", "B12", {}), ('aria-label="關閉，返回快遞首頁"', "B10", {})]),
+ ("B12", "B12 運送須知（讀完）", B[11][1], [(">我已閱讀並同意<", "B13", {}), ('aria-label="關閉，返回快遞首頁"', "B10", {})]),
+ ("B13", "B13 確認彈窗", B[12][1], [(">確認送出<", "B14", {}), ("返回修改", "B10", {})]),
+ ("B14", "B14 送出成功", B[13][1], [('aria-label="關閉"', "B1", {})]),
+ ("C1", "C1 快遞首頁（沒開定位）", C[0][1], [("要從哪裡寄？", "C2", {}), (">填寫地址<", "C2", {})]),
+ ("C2", "C2 地址輸入頁（先填取件）", C[1][1], [("使用目前位置", "C3", {}), ('aria-label="返回"', "C1", {})]),
+ ("C3", "C3 系統詢問定位權限", C[2][1], [("不允許", "C4", {}), ("使用 App 期間允許", "C6", {}), ("允許一次", "C6", {})]),
+ ("C4", "C4 地址輸入頁（定位未開啟）", C[3][1], [(r, "C5", {}) for r in RES] + [('aria-label="返回"', "C1", {})]),
+ ("C5", "C5 取件地址詳情", C[4][1], [(">確認<", "C6", {}), ('aria-label="返回地址輸入頁"', "C4", {})]),
+ ("C6", "C6 地址輸入頁（選好取件）", C[5][1], [(r, "C7", {}) for r in RES] + [('aria-label="返回"', "C1", {})]),
+ ("C7", "C7 送件地址詳情", C[6][1], [(">確認<", "C8", {}), ('aria-label="返回地址輸入頁"', "C6", {})]),
+ ("C8", "C8 快遞首頁（填完地址）", C[7][1], [("送出訂單・[折後價]", "B5", {})]),
+]
+
+SKEL = '''<!doctype html>
+<html lang="zh-Hant">
+<head>
+<meta charset="utf-8">
+<title>{title}</title>
+<script src="./support.js"></script>
+</head>
+<body>
+<x-dc>
+<helmet>
+<link href="https://fonts.googleapis.com/css2?family=Noto+Sans+TC:wght@400;500;700&display=swap" rel="stylesheet">
+<style>
+body{{margin:0}}
+a{{color:#1F2328}}a:hover{{color:#000000}}
+[data-hscroll]::-webkit-scrollbar{{display:none}}
+</style>
+</helmet>
+{body}
+</x-dc>
+<script type="text/x-dc" data-dc-script data-props='{{"$preview":{{"width":390,"height":844}}}}'>
+class Component extends DCLogic {{
+renderVals() {{
+return {{}};
+}}
+}}
+</script>
+</body>
+</html>
+'''
+import os
+keys = {k for k, *_ in screens}
+rows = {"A": 0, "D": 1, "B": 2, "C": 3}
+order_in_row = {}
+boards = {}
+for key, title, body, links in screens:
+    b = prep(body)
+    for needle, tgt, kw in links:
+        assert tgt in keys, tgt
+        b = link(b, needle, F(tgt), **kw)
+    open(f"{P}/{F(key)}", "w", encoding="utf-8").write(SKEL.format(title=title, body=b))
+    r = "A" if key == "AP" else key[0]
+    n = order_in_row.get(r, 0); order_in_row[r] = n + 1
+    boards[F(key)] = {"h": 844, "w": 390, "x": n * 470, "y": rows[r] * 1300, "is_interactive": True, "page": "proto", "title": title}
+print(json.dumps(boards, ensure_ascii=False))
