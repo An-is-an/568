@@ -86,7 +86,7 @@ def promo_open(ratio="5:2", code=False):
         return f'<div style="flex-shrink: 0; width: {w}px; display: flex; flex-direction: column">{img}{CODE_BAR if code else ""}</div>'
     head = promo_row(True).replace("border-radius: 10px; background: #E6E8EB;", "background: none;")
     return ('<section aria-label="快遞專屬優惠，第 1 張，共 3 張" style="flex-shrink: 0; background: #E6E8EB; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column">'
-            + head + '<div style="padding: 0 0 12px 12px"><div style="display: flex; gap: 8px">'
+            + head + '<div data-hscroll="" style="padding: 0 0 12px 12px; overflow-x: auto; scrollbar-width: none"><div style="display: flex; gap: 8px">'
             + card(f"[車隊上傳的優惠圖 {ratio}]") + card("[第 2 張]") + '</div></div></section>')
 def entry(ratio="5:2", code=False):
     return clip(rep(s1, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_open(ratio, code)))
@@ -166,6 +166,7 @@ html = f'''<!doctype html>
 <style>
 body{{margin:0}}
 a{{color:#1F2328}}a:hover{{color:#000000}}
+[data-hscroll]::-webkit-scrollbar{{display:none}}
 </style>
 </helmet>
 <div style="position: relative; width: {W}px; height: {H}px; background: #FFFFFF; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #1F2328">
@@ -184,6 +185,6 @@ return {{}};
 </body>
 </html>
 '''
-html = home_header(html)
+html = hscroll(home_header(html))
 open(f"{P}/AdSlot.dc.html", "w", encoding="utf-8").write(html)
 print(len(html), "bytes;", W, "x", H)

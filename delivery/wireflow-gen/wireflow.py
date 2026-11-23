@@ -30,6 +30,10 @@ _HOME_TITLE = '<div style="font-size: 17px; font-weight: 700">即時快遞</div>
 _SHEET_HDR = '<div style="height: 56px; background: #FFFFFF; border-bottom: 1px solid #D5D8DD; display: flex; align-items: center; padding: 0 16px">\n    ' + _HOME_TITLE
 _BACK_BTN = ('<button type="button" aria-label="返回" style="width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328">'
              '<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button>')
+def hscroll(h):
+    # horizontal rows still swipe, but without a visible scroll bar (designer 2026-11-23);
+    # scrollbar-width covers Firefox/Chromium/Safari 18.2+, the helmet rule covers older WebKit
+    return h.replace('<div style="display: flex; gap: 8px; overflow-x: auto;', '<div data-hscroll="" style="display: flex; gap: 8px; overflow-x: auto; scrollbar-width: none;')
 _SQ = "position: absolute; top: 8px; width: 44px; height: 44px; border: 0; border-radius: 10px; background: #FFFFFF; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"
 HERO = ('<div style="flex-shrink: 0; position: relative; height: 184px; background: #E6E8EB">'
         # illustration placeholder removed for a cleaner review with the requester (designer 2026-11-23)
@@ -370,6 +374,7 @@ html = f'''<!doctype html>
 <style>
 body{{margin:0}}
 a{{color:#1F2328}}a:hover{{color:#000000}}
+[data-hscroll]::-webkit-scrollbar{{display:none}}
 </style>
 </helmet>
 <div style="position: relative; width: {W}px; height: {H}px; background: #FFFFFF; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #1F2328">
@@ -388,6 +393,6 @@ return {{}};
 </body>
 </html>
 '''
-html = home_header(html)
+html = hscroll(home_header(html))
 open(f"{P}/Wireflow.dc.html", "w", encoding="utf-8").write(html)
 print(len(html), "bytes;", len(arrows), "arrow svgs;", mid[0], "heads")
