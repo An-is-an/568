@@ -82,7 +82,7 @@ def promo_open(ratio="5:2", code=False):
     def card(label):
         img = (f'<div style="position: relative; height: {h}px; box-sizing: border-box; background: #F4F4F5; border: 1px solid #C9CDD3; border-radius: {"10px 10px 0 0" if code else "10px"}; '
                f'display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5B6470">{label}'
-               '<div style="position: absolute; left: 8px; top: 8px; font-size: 11px; font-weight: 700; background: #FFFFFF; color: #1F2328; border-radius: 4px; padding: 1px 6px">優惠</div></div>')
+               '<div style="position: absolute; left: 8px; top: 8px; font-size: 11px; font-weight: 700; background: #FFFFFF; color: #1F2328; border-radius: 4px; padding: 1px 6px">廣告</div></div>')
         return f'<div style="flex-shrink: 0; width: {w}px; display: flex; flex-direction: column">{img}{CODE_BAR if code else ""}</div>'
     head = promo_row(True).replace("border-radius: 10px; background: #E6E8EB;", "background: none;")
     return ('<section aria-label="快遞專屬優惠，第 1 張，共 3 張" style="flex-shrink: 0; background: #E6E8EB; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column">'
@@ -176,5 +176,6 @@ return {{}};
 </body>
 </html>
 '''
+html = home_header(html)
 open(f"{P}/AdSlot.dc.html", "w", encoding="utf-8").write(html)
 print(len(html), "bytes;", W, "x", H)

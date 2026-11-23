@@ -22,6 +22,19 @@ def hint(nxt, n):
     return ('<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px">'
             f'<div style="font-weight: 700">下一步：{nxt}</div><div style="color: #5B6470">還缺 {n} 項</div></div>\n    ')
 
+# ---------- home header: back on the left, order history on the right (as in the current app) ----------
+_RECEIPT = '<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round"><path d="M5 3h14v18l-3-2-2 2-2-2-2 2-2-2-3 2z"></path><path d="M9 8h6M9 12h6"></path></svg>'
+ORDER_BTN = ('<button type="button" aria-label="訂單紀錄" style="margin-left: auto; position: relative; width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328">'
+             + _RECEIPT + '<span aria-hidden="true" style="position: absolute; top: 3px; right: 1px; min-width: 18px; height: 18px; box-sizing: border-box; border: 2px solid #FFFFFF; border-radius: 9px; background: #1F2328; color: #FFFFFF; font-size: 10px; font-weight: 700; display: flex; align-items: center; justify-content: center; padding: 0 3px">9</span></button>')
+_HOME_TITLE = '<div style="font-size: 17px; font-weight: 700">即時快遞</div>'
+_SHEET_HDR = '<div style="height: 56px; background: #FFFFFF; border-bottom: 1px solid #D5D8DD; display: flex; align-items: center; padding: 0 16px">\n    ' + _HOME_TITLE
+_BACK_BTN = ('<button type="button" aria-label="返回" style="width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328">'
+             '<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button>')
+def home_header(h):
+    # the confirm sheet's background page lacked the back button
+    h = h.replace(_SHEET_HDR, '<div style="height: 56px; background: #FFFFFF; border-bottom: 1px solid #D5D8DD; display: flex; align-items: center; padding: 0 8px; gap: 4px">\n    ' + _BACK_BTN + '\n    ' + _HOME_TITLE)
+    return h.replace(_HOME_TITLE, _HOME_TITLE + '\n    ' + ORDER_BTN)
+
 # ---------- screens ----------
 SWAP_SVG = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16"></path><path d="M4 8l4-4 4 4"></path><path d="M16 20V4"></path><path d="M12 16l4 4 4-4"></path></svg>'
 SWAP_BTN = ('<div style="position: relative; height: 0; z-index: 1">'
@@ -356,5 +369,6 @@ return {{}};
 </body>
 </html>
 '''
+html = home_header(html)
 open(f"{P}/Wireflow.dc.html", "w", encoding="utf-8").write(html)
 print(len(html), "bytes;", len(arrows), "arrow svgs;", mid[0], "heads")
