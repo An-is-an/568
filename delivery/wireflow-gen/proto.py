@@ -177,6 +177,24 @@ def swap_toggle(b):
           "return { plain: !s.swapped, swapped: !!s.swapped, toggleSwap: () => this.setState({ swapped: !(this.state || {}).swapped }) };")
     return b, js
 
+def swap_half(b, empty_target):
+    """home with only the pickup filled (B1): swap in place -> pickup empty, drop-off = that address,
+    member data moves to the recipient (same rows as lane A2's swapped home)."""
+    i = b.find(CARD_OPEN)
+    j = _close(b, i, "div")
+    card = b[i:j]
+    on = '<button type="button" aria-label="取件與送件地址對調" onClick="{{toggleSwap}}"'
+    assert '<button type="button" aria-label="取件與送件地址對調"' in card
+    card = card.replace('<button type="button" aria-label="取件與送件地址對調"', on, 1)
+    swap_btn = SWAP_BTN.replace('<button type="button" aria-label="取件與送件地址對調"', on, 1)
+    alt = (CARD_OPEN + PICK_MISS.replace('border-radius: 12px 0 0 0', 'border-radius: 12px 12px 0 0').replace('href="#"', f'href="{empty_target}"', 1)
+           + swap_btn + DROP_ME.replace("[目前位置或上次地址]", "[目前位置]") + '</div>')
+    b = (b[:i] + '<sc-if value="{{plain}}" hint-placeholder-val="{{ true }}">' + card + '</sc-if>'
+         '<sc-if value="{{swapped}}" hint-placeholder-val="{{ false }}">' + alt + '</sc-if>' + b[j:])
+    js = ("const s = this.state || {};\n"
+          "return { plain: !s.swapped, swapped: !!s.swapped, toggleSwap: () => this.setState({ swapped: !(this.state || {}).swapped }) };")
+    return b, js
+
 def contact_fill(b):
     """favorites toggle and contact fields on address detail: '填入我的資料' fills the member, the contacts icon fills a contact,
     both overwrite name and phone together; typing still works (controlled inputs)."""
@@ -215,7 +233,7 @@ for key, title, body, links in screens:
         assert tgt in keys, tgt
         b = link(b, needle, F(tgt), **kw)
     b, vals = contact_fill(b)
-    b, sv = swap_toggle(b)
+    b, sv = swap_half(b, F("B2")) if key == "B1" else swap_toggle(b)
     if sv:
         assert vals == "return {};", key
         vals = sv
