@@ -48,9 +48,10 @@ def home_header(h):
         out.append(h[pos:m.start()]); out.append(HERO)
         n = _AFTER_HERO_RE.match(h, len(h[:m.end()]) + (len(h[m.end():]) - len(h[m.end():].lstrip())))
         assert n, "content block must follow the home header"
-        out.append(n.group(1) + "position: relative; margin-top: -79px; " + n.group(2)); pos = n.end()
+        out.append(n.group(1) + "position: relative; margin-top: -48px; " + n.group(2)); pos = n.end()
     out.append(h[pos:])
-    return "".join(out)
+    # no "配送地址" label above the card (designer 2026-11-23: too much text)
+    return re.sub(r'<div style="font-size: 13px; font-weight: 500; color: #5B6470">配送地址</div>\s*', "", "".join(out))
 
 # ---------- screens ----------
 SWAP_SVG = '<svg aria-hidden="true" width="22" height="22" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M8 4v16"></path><path d="M4 8l4-4 4 4"></path><path d="M16 20V4"></path><path d="M12 16l4 4 4-4"></path></svg>'
