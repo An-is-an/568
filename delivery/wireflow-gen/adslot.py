@@ -64,12 +64,12 @@ CURRENT = f'''<div style="width: 390px; height: 844px; box-sizing: border-box; p
 </div>'''
 
 # 2-6 the designer's home page with the banner block
-_TAG = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="flex-shrink: 0"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.5"></circle></svg>'
+_GIFT = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="flex-shrink: 0"><rect x="3.5" y="8" width="17" height="4" rx="1"></rect><path d="M5.5 12v8.5h13V12"></path><path d="M12 8v12.5"></path><path d="M12 8C10.5 5 7 4.5 7 6.5S9.5 8 12 8z"></path><path d="M12 8c1.5-3 5-3.5 5-1.5S14.5 8 12 8z"></path></svg>'  # gift: contents are not always about price
 def promo_row(expanded):
     # gray bar; the page ground is #F4F4F5, so the bar uses the next gray step to stay visible
     d = "M6 15l6-6 6 6" if expanded else "M6 9l6 6 6-6"
     return (f'<button type="button" aria-expanded="{"true" if expanded else "false"}" aria-label="快遞專屬優惠，{"收起" if expanded else "展開"}" style="flex-shrink: 0; min-height: 48px; border: 0; border-radius: 10px; background: #E6E8EB; padding: 0 12px 0 14px; font: inherit; font-size: 14px; font-weight: 500; color: #1F2328; display: flex; align-items: center; gap: 8px">'
-            + _TAG + '<span style="flex: 1; text-align: left">快遞專屬優惠</span>'
+            + _GIFT + '<span style="flex: 1; text-align: left">快遞專屬優惠</span>'
             f'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0"><path d="{d}"></path></svg></button>')
 CODE_BAR = ('<div style="height: 48px; box-sizing: border-box; background: #FFFFFF; border: 1px solid #C9CDD3; border-top: 0; border-radius: 0 0 10px 10px; '
             'padding: 0 6px 0 12px; display: flex; align-items: center; gap: 8px">'
