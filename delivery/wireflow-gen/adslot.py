@@ -93,6 +93,34 @@ def entry(ratio="5:2", code=False):
 e52 = entry()
 e21 = entry("2:1")
 ec = entry(code=True)
+
+# comparison A: the banner takes the header illustration's place (full-bleed 5:2, swipe, no title)
+_AD_BADGE = '<div style="position: absolute; left: 16px; bottom: 40px; font-size: 11px; font-weight: 700; background: #FFFFFF; color: #1F2328; border-radius: 4px; padding: 1px 6px">廣告</div>'
+def _hero_slide(label):
+    return (f'<div style="flex-shrink: 0; width: 390px; height: 156px; position: relative; box-sizing: border-box; background: #D5D8DD; border-bottom: 1px solid #C9CDD3; '
+            f'display: flex; align-items: center; justify-content: center; font-size: 14px; color: #3D444D">{label}{_AD_BADGE}</div>')
+HERO_AD = ('<div style="flex-shrink: 0; position: relative; height: 184px; background: #E6E8EB">'
+           '<section aria-label="快遞專屬優惠，第 1 張，共 3 張" data-hscroll="" style="position: absolute; left: 0; top: 0; width: 390px; height: 156px; overflow-x: auto; scrollbar-width: none; display: flex">'
+           + _hero_slide("[車隊上傳的優惠圖 5:2，滿版]") + _hero_slide("[第 2 張]") + '</section>'
+           + _BACK_BTN.replace('style="width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"', f'style="{_SQ}; left: 12px"')
+           + ORDER_BTN.replace('style="margin-left: auto; position: relative; width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"', f'style="{_SQ}; right: 12px"')
+           + '</div>')
+eA = clip(s1)
+eA, _k = _BAR_RE.subn(lambda m: HERO_AD, eA); assert _k == 1
+eA = rep(eA, '<div style="' + CONTENT, '<div style="position: relative; margin-top: -64px; ' + CONTENT)
+
+# comparison B: two smaller cards side by side in the same gray block (4:3, third one peeks)
+def promo_pair():
+    w, h = 150, 112
+    def card(label):
+        return (f'<div style="flex-shrink: 0; width: {w}px; height: {h}px; position: relative; box-sizing: border-box; background: #F4F4F5; border: 1px solid #C9CDD3; border-radius: 10px; '
+                f'display: flex; align-items: center; justify-content: center; text-align: center; padding: 0 8px; font-size: 13px; color: #5B6470">{label}'
+                '<div style="position: absolute; left: 8px; top: 8px; font-size: 11px; font-weight: 700; background: #FFFFFF; color: #1F2328; border-radius: 4px; padding: 1px 6px">廣告</div></div>')
+    head = promo_row(True).replace("border-radius: 10px; background: #E6E8EB;", "background: none;")
+    return ('<section aria-label="快遞專屬優惠，共 3 張" style="flex-shrink: 0; background: #E6E8EB; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column">'
+            + head + '<div data-hscroll="" style="padding: 0 0 12px 12px; overflow-x: auto; scrollbar-width: none"><div style="display: flex; gap: 8px">'
+            + card("[車隊 A 的優惠圖 4:3]") + card("[車隊 B 的優惠圖 4:3]") + card("[第 3 張]") + '</div></div></section>')
+eB = clip(rep(s1, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_pair()))
 filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(False)))
 opened = rep(clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_open())), CONTENT + '; overflow: hidden', CONTENT + '; overflow: hidden; justify-content: flex-end')
 # scrolled up: per the design spec the illustrated header collapses into a white nav bar
@@ -115,7 +143,11 @@ items = [
      "在原地展開同一組 banner，banner 放在同一個灰底區塊裡，不跳頁、不是連結；頁面捲到 banner 的位置；往上滑時頁首照設計規範收成白色導覽列（返回、置中標題、訂單紀錄），插圖區被捲出。廣告改為 5:2（約 280 × 112），比 3:1 窄一點、高一點；不放頁數點點，靠右側露出的下一張暗示可滑。與入口同一個區塊、同一個比例，車隊只做一份素材。再點一次（收起圖示）回到第 3 頁。"),
     ("5 比較：banner 改 2:1", e21,
      "同第 2 頁，banner 改 2:1，約 280 × 140，比 5:2 高約 30；區塊更搶眼，小螢幕上大半會在畫面外。給需求方看「更大」的樣子。"),
-    ("6 內容是序號優惠時", ec,
+    ("6 比較：廣告放進頁首插圖區", eA,
+     "插圖位置換成滿版的 5:2 banner，一進來最先看到，頁面不多一塊；下方不再放優惠區塊。可左右滑，但滿版沒有露出下一張，看不出能滑。返回、訂單按鈕壓在圖上，地址卡片蓋住圖的下緣，上架規格要留上方與下方安全區；圖的位置在最上方，內容要乾淨。頁面標題「即時快遞」被廣告取代。地址填完後換回一般頁首。"),
+    ("7 比較：一次並排兩張小卡", eB,
+     "同一個灰底區塊，改成 4:3 小卡（約 150 × 112）並排，一眼看到兩家車隊，第 3 張露出邊緣表示可滑；區塊高度與 5:2 相近。每次進來不只第一張有曝光，對多家車隊較公平；代價是每張變小、圖上的字更少，比例與 5:2 不同，車隊要多做一份素材。另外兩種沒畫：送出成功頁再放一次（對下一單有效，但該頁不在這次範圍）；進入時跳出廣告彈窗（擋住填地址，不建議）。"),
+    ("8 內容是序號優惠時", ec,
      "車隊上架時有選填序號文字，banner 下方才多一列序號與「複製序號」；沒填就只顯示圖片。圖片本身仍不能點，與第 2 頁同一個區塊。複製後到「付款與優惠」兌換（兌換畫面待補）。"),
 ]
 
@@ -146,7 +178,7 @@ extra.append(f'<svg role="img" aria-label="從地址填完到展開：點快遞�
              f'<path d="M 0 4 L {x2-x1-4} 4" marker-end="url(#dc-arrow-head-filled-ad2)"></path></svg>')
 lab(x1 + 8, ay - 48, 134, "點快遞專屬優惠", size=15, lh=20)
 # separators: current | proposal | comparison
-for k in (1, 4):
+for k in (1, 4, 7):
     sx = X0 + k * PITCH - (PITCH - SW) // 2
     extra.append(f'<div aria-hidden="true" style="position: absolute; left: {sx}px; top: {Y - 60}px; width: 0; height: {SH + 260}px; border-left: 2px dashed #D5D8DD"></div>')
 lab(X0, 96, W - 2 * X0, "廣告版位｜快遞首頁的 banner：比例與位置的比較", size=36, lh=48, color="#1F2328", weight=700)
