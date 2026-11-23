@@ -129,7 +129,7 @@ renderVals() {{
 '''
 import os
 def contact_fill(b):
-    """contact fields on address detail: '填入我的資料' fills the member, the contacts icon fills a contact,
+    """favorites toggle and contact fields on address detail: '填入我的資料' fills the member, the contacts icon fills a contact,
     both overwrite name and phone together; typing still works (controlled inputs)."""
     if ">填入我的資料<" not in b:
         return b, "return {};"
@@ -143,11 +143,18 @@ def contact_fill(b):
     b = re.sub(r'<button type="button"( style="[^"]*")>填入我的資料</button>', r'<button type="button" onClick="{{fillMe}}"\1>填入我的資料</button>', b, count=1)
     b = b.replace('<button type="button" aria-label="從通訊錄帶入姓名與電話"', '<button type="button" aria-label="從通訊錄帶入姓名與電話" onClick="{{fillContact}}"', 1)
     assert "{{fillMe}}" in b and "{{fillContact}}" in b
+    # 加入最愛 toggles: heart fills, label becomes 已加入最愛
+    m = re.search(r'<button type="button" aria-pressed="false"( style="[^"]*">)(<svg [^>]*?)fill="none"([^>]*>.*?</svg>)加入最愛</button>', b, re.S)
+    assert m, "favorites button"
+    b = b[:m.start()] + ('<button type="button" aria-pressed="{{favPressed}}" onClick="{{toggleFav}}"' + m.group(1)
+                         + m.group(2) + 'fill="{{favFill}}"' + m.group(3) + '{{favLabel}}</button>') + b[m.end():]
     js = ("const s = this.state || {};\n"
           f"return {{ cname: s.cname ?? {json.dumps(init['cname'], ensure_ascii=False)}, cphone: s.cphone ?? {json.dumps(init['cphone'], ensure_ascii=False)},\n"
           "  onName: (e) => this.setState({ cname: e.target.value }), onPhone: (e) => this.setState({ cphone: e.target.value }),\n"
           "  fillMe: () => this.setState({ cname: '[會員姓名]', cphone: '[會員電話]' }),\n"
-          "  fillContact: () => this.setState({ cname: '[通訊錄的姓名]', cphone: '[通訊錄的電話]' }) };")
+          "  fillContact: () => this.setState({ cname: '[通訊錄的姓名]', cphone: '[通訊錄的電話]' }),\n"
+          "  favPressed: s.fav ? 'true' : 'false', favFill: s.fav ? 'currentColor' : 'none', favLabel: s.fav ? '已加入最愛' : '加入最愛',\n"
+          "  toggleFav: () => this.setState({ fav: !(this.state || {}).fav }) };")
     return b, js
 keys = {k for k, *_ in screens}
 rows = {"A": 0, "D": 1, "B": 2, "C": 3}
