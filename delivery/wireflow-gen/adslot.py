@@ -7,33 +7,6 @@ _src = open("wireflow.py", encoding="utf-8").read()
 exec(_src[:_src.index("# ---------- layout ----------")])
 
 CONTENT = 'flex: 1; min-height: 0; padding: 16px; display: flex; flex-direction: column; gap: 12px'
-CARD_W = 330
-
-def slide(h, label, code):
-    img = (f'<div style="position: relative; height: {h}px; box-sizing: border-box; background: #E6E8EB; border: 1px solid #D5D8DD; '
-           f'border-radius: {"12px 12px 0 0" if code else "12px"}; display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5B6470">{label}'
-           '<div style="position: absolute; left: 8px; top: 8px; font-size: 11px; font-weight: 700; background: #FFFFFF; color: #1F2328; border-radius: 4px; padding: 1px 6px">優惠</div></div>')
-    if not code:
-        return f'<div style="flex-shrink: 0; width: {CARD_W}px">{img}</div>'
-    bar = ('<div style="height: 48px; box-sizing: border-box; background: #FFFFFF; border: 1px solid #D5D8DD; border-top: 0; border-radius: 0 0 12px 12px; '
-           'padding: 0 6px 0 12px; display: flex; align-items: center; gap: 8px">'
-           '<div style="font-size: 13px; color: #5B6470; flex-shrink: 0">序號</div>'
-           '<div style="flex: 1; min-width: 0; font-size: 15px; font-weight: 700; letter-spacing: 1px">[ABCD1234]</div>'
-           '<button type="button" style="height: 36px; border: 1px solid #1F2328; border-radius: 18px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #1F2328; padding: 0 12px">複製序號</button></div>')
-    return f'<div style="flex-shrink: 0; width: {CARD_W}px; display: flex; flex-direction: column">{img}{bar}</div>'
-
-def ad(ratio, code=False):
-    h = round(CARD_W / ratio)
-    name = {3: "3:1", 2: "2:1"}[ratio]
-    dots = ('<div aria-hidden="true" style="display: flex; justify-content: center; gap: 4px">'
-            '<span style="width: 16px; height: 4px; border-radius: 2px; background: #1F2328"></span>'
-            '<span style="width: 4px; height: 4px; border-radius: 2px; background: #A3A9B1"></span>'
-            '<span style="width: 4px; height: 4px; border-radius: 2px; background: #A3A9B1"></span></div>')
-    return ('<section aria-label="合作車隊的優惠，第 1 張，共 3 張" style="flex-shrink: 0; margin: 0 -16px; padding: 0 16px; overflow: hidden; display: flex; flex-direction: column; gap: 8px">'
-            '<div style="display: flex; gap: 8px">'
-            + slide(h, f"[車隊上傳的優惠圖 {name}]", code) + slide(h, "[第 2 張]", code) +
-            '</div>' + dots + '</section>')
-
 def clip(h):
     return rep(h, CONTENT, CONTENT + '; overflow: hidden')
 
@@ -90,13 +63,7 @@ CURRENT = f'''<div style="width: 390px; height: 844px; box-sizing: border-box; p
   </div>
 </div>'''
 
-# 2-5 the designer's home page with the banner
-def entry(ratio, code=False):
-    return clip(rep(s1_swap, LIMIT_BOX, LIMIT_BOX + "\n    " + ad(ratio, code)))
-s1_swap = s1
-e3 = entry(3)
-e2 = entry(2)
-ec = entry(3, code=True)
+# 2-6 the designer's home page with the banner block
 _TAG = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="flex-shrink: 0"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.5"></circle></svg>'
 def promo_row(expanded):
     # gray bar; the page ground is #F4F4F5, so the bar uses the next gray step to stay visible
@@ -104,37 +71,44 @@ def promo_row(expanded):
     return (f'<button type="button" aria-expanded="{"true" if expanded else "false"}" aria-label="快遞專屬優惠，{"收起" if expanded else "展開"}" style="flex-shrink: 0; min-height: 48px; border: 0; border-radius: 10px; background: #E6E8EB; padding: 0 12px 0 14px; font: inherit; font-size: 14px; font-weight: 500; color: #1F2328; display: flex; align-items: center; gap: 8px">'
             + _TAG + '<span style="flex: 1; text-align: left">快遞專屬優惠</span>'
             f'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0"><path d="{d}"></path></svg></button>')
-filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(False)))
-def promo_open():
-    # expanded: the banners sit inside the same gray block as the header
-    w = 280; h = 112  # 5:2, narrower and taller than 3:1 (designer 2026-11-23)
-    def img(label):
-        return (f'<div style="flex-shrink: 0; width: {w}px; position: relative; height: {h}px; box-sizing: border-box; background: #F4F4F5; border: 1px solid #C9CDD3; border-radius: 10px; '
-                f'display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5B6470">{label}'
-                '<div style="position: absolute; left: 8px; top: 8px; font-size: 11px; font-weight: 700; background: #FFFFFF; color: #1F2328; border-radius: 4px; padding: 1px 6px">優惠</div></div>')
-    dots = ('<div aria-hidden="true" style="display: flex; justify-content: center; gap: 4px; padding-right: 12px">'
-            '<span style="width: 16px; height: 4px; border-radius: 2px; background: #1F2328"></span>'
-            '<span style="width: 4px; height: 4px; border-radius: 2px; background: #A3A9B1"></span>'
-            '<span style="width: 4px; height: 4px; border-radius: 2px; background: #A3A9B1"></span></div>')
-    head = promo_row(True).replace("flex-shrink: 0; min-height: 48px; border: 0; border-radius: 10px; background: #E6E8EB;", "flex-shrink: 0; min-height: 48px; border: 0; background: none;")
+CODE_BAR = ('<div style="height: 48px; box-sizing: border-box; background: #FFFFFF; border: 1px solid #C9CDD3; border-top: 0; border-radius: 0 0 10px 10px; '
+            'padding: 0 6px 0 12px; display: flex; align-items: center; gap: 8px">'
+            '<div style="font-size: 13px; color: #5B6470; flex-shrink: 0">序號</div>'
+            '<div style="flex: 1; min-width: 0; font-size: 15px; font-weight: 700; letter-spacing: 1px">[ABCD1234]</div>'
+            '<button type="button" style="height: 36px; border: 1px solid #1F2328; border-radius: 18px; background: #FFFFFF; font: inherit; font-size: 13px; font-weight: 700; color: #1F2328; padding: 0 12px">複製序號</button></div>')
+def promo_open(ratio="5:2", code=False):
+    # the banner block, open: header on top, banners inside the same gray block, no page dots
+    w = 280; h = {"5:2": 112, "2:1": 140}[ratio]
+    def card(label):
+        img = (f'<div style="position: relative; height: {h}px; box-sizing: border-box; background: #F4F4F5; border: 1px solid #C9CDD3; border-radius: {"10px 10px 0 0" if code else "10px"}; '
+               f'display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5B6470">{label}'
+               '<div style="position: absolute; left: 8px; top: 8px; font-size: 11px; font-weight: 700; background: #FFFFFF; color: #1F2328; border-radius: 4px; padding: 1px 6px">優惠</div></div>')
+        return f'<div style="flex-shrink: 0; width: {w}px; display: flex; flex-direction: column">{img}{CODE_BAR if code else ""}</div>'
+    head = promo_row(True).replace("border-radius: 10px; background: #E6E8EB;", "background: none;")
     return ('<section aria-label="快遞專屬優惠，第 1 張，共 3 張" style="flex-shrink: 0; background: #E6E8EB; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column">'
             + head + '<div style="padding: 0 0 12px 12px"><div style="display: flex; gap: 8px">'
-            + img("[車隊上傳的優惠圖 5:2]") + img("[第 2 張]") + '</div></div></section>')
+            + card(f"[車隊上傳的優惠圖 {ratio}]") + card("[第 2 張]") + '</div></div></section>')
+def entry(ratio="5:2", code=False):
+    return clip(rep(s1, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_open(ratio, code)))
+e52 = entry()
+e21 = entry("2:1")
+ec = entry(code=True)
+filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(False)))
 opened = rep(clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_open())), CONTENT + '; overflow: hidden', CONTENT + '; overflow: hidden; justify-content: flex-end')
 
 items = [
     ("1 現行做法", CURRENT,
      "照現行畫面畫成灰階。1:4 的輪播 banner 在卡片下方，有頁數點點；高度不到 90，圖上的字很小。看起來像能點，實際點了沒有反應。"),
-    ("2 入口：3:1（建議）", e3,
-     "兩個地址還沒填完，是吸引下單的時刻：banner 放在物品限制下方（物品限制規則不放在廣告下方）。3:1，約 330 × 110。一次一張、可手動滑，右側露出下一張；不自動播放，每次進入輪流換第一張，讓各車隊公平曝光。「優惠」標籤由 App 疊上。在 iPhone SE 這類小螢幕，banner 會被裁到畫面下緣，要往下滑才看得完整。"),
+    ("2 入口：展開的優惠區塊（建議）", e52,
+     "兩個地址還沒填完，是吸引下單的時刻：優惠區塊預設展開，放在物品限制下方（物品限制規則不放在廣告下方），與第 4 頁同一個灰底區塊。banner 5:2，約 280 × 112。一次一張、可手動滑，右側露出下一張；不放頁數點點、不自動播放，每次進入輪流換第一張，讓各車隊公平曝光。「優惠」標籤由 App 疊上。在 iPhone SE 這類小螢幕，區塊會被裁到畫面下緣，要往下滑才看得完整。"),
     ("3 地址填完：收成一行", filled,
      "送件地址填完後，付款與發票出現，banner 收成物品限制下方的一條灰底「快遞專屬優惠」，不顯示圖片、不寫張數，右側只有展開圖示，送出前不搶注意力。不完全藏起來：內容是序號時，使用者還找得到。運費與主按鈕的折後價是計價規則，與 banner 無關。"),
     ("4 點開「快遞專屬優惠」", opened,
-     "在原地展開同一組 banner，banner 放在同一個灰底區塊裡，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。廣告改為 5:2（約 280 × 112），比 3:1 窄一點、高一點；不放頁數點點，靠右側露出的下一張暗示可滑。入口目前仍是 3:1，兩處比例要統一，車隊才不必做兩份素材（待定）。再點一次（收起圖示）回到第 3 頁。"),
-    ("5 比較：入口改 2:1", e2,
-     "同第 2 頁，比例改 2:1，約 330 × 165，比兩個地址欄還高，入口時搶過「填地址」；小螢幕上大半會在畫面外。給需求方看「更大」的樣子。"),
+     "在原地展開同一組 banner，banner 放在同一個灰底區塊裡，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。廣告改為 5:2（約 280 × 112），比 3:1 窄一點、高一點；不放頁數點點，靠右側露出的下一張暗示可滑。與入口同一個區塊、同一個比例，車隊只做一份素材。再點一次（收起圖示）回到第 3 頁。"),
+    ("5 比較：banner 改 2:1", e21,
+     "同第 2 頁，banner 改 2:1，約 280 × 140，比 5:2 高約 30；區塊更搶眼，小螢幕上大半會在畫面外。給需求方看「更大」的樣子。"),
     ("6 內容是序號優惠時", ec,
-     "車隊上架時有選填序號文字，banner 下方才多一列序號與「複製序號」；沒填就只顯示圖片。圖片本身仍不能點。複製後到「付款與優惠」兌換（兌換畫面待補）。"),
+     "車隊上架時有選填序號文字，banner 下方才多一列序號與「複製序號」；沒填就只顯示圖片。圖片本身仍不能點，與第 2 頁同一個區塊。複製後到「付款與優惠」兌換（兌換畫面待補）。"),
 ]
 
 SW, SH, PITCH, X0, Y = 390, 844, 540, 96, 340
