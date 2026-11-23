@@ -67,12 +67,13 @@ INPUT_SWAP_RE = r'\s*<div style="flex-shrink: 0; display: flex; flex-direction: 
 def noswap(h):
     h, k = re.subn(INPUT_SWAP_RE, '', h, count=1, flags=re.S); assert k == 1
     return h
-LIMIT_BOX = ('<div style="background: #FFFFFF; border: 1px solid #D5D8DD; border-radius: 12px; padding: 12px 16px; display: flex; align-items: center; gap: 12px">'
-             '<svg aria-hidden="true" width="30" height="30" viewBox="0 0 32 32" fill="none" stroke="#1F2328" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0">'
+# item limits: lowered to secondary weight (designer 2026-11-23) -- no card, small text, secondary gray, 18px icon
+LIMIT_BOX = ('<div role="note" style="display: flex; align-items: flex-start; gap: 8px; padding: 0 4px; color: #5B6470">'
+             '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 32 32" fill="none" stroke="currentColor" stroke-width="2.4" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0; margin-top: 1px">'
              '<circle cx="8" cy="23" r="3.5"></circle><circle cx="25" cy="23" r="3.5"></circle><path d="M3 18h11v-6H3z"></path><path d="M11.5 23h10l-2-11h-3"></path><path d="M20 12h4"></path></svg>'
              '<div style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px">'
-             '<div style="font-size: 15px; font-weight: 700">本服務由機車配送</div>'
-             '<div style="font-size: 13px; color: #3D444D">包裹總重量 &lt; 15kg，長寬高皆 ≤ 40cm。</div></div></div>')
+             '<div style="font-size: 13px">本服務由機車配送</div>'
+             '<div style="font-size: 12px">包裹總重量 &lt; 15kg，長寬高皆 ≤ 40cm。</div></div></div>')
 # Lane A (returning user)
 s1 = root("Main.dc.html")
 PAYSEC_A = r'\s*<div style="font-size: 13px; font-weight: 500; color: #5B6470; margin-top: 8px">付款與發票</div>.*?</svg>\s*</div>\s*</div>'
