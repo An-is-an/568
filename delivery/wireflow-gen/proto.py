@@ -144,7 +144,7 @@ renderVals() {{
 import os
 def swap_toggle(b):
     """homes with both addresses: the swap button exchanges the two addresses in place; contacts follow
-    their address (member data moves to the recipient). Drawn as two copies of the address card."""
+    their address (member data moves to the recipient), and so does the note. Drawn as two copies of the address card."""
     i = b.find(CARD_OPEN)
     if i < 0 or '<button type="button" aria-label="取件與送件地址對調"' not in b:
         return b, None
@@ -160,6 +160,14 @@ def swap_toggle(b):
         alt = alt.replace(a_, b_, 1)
     alt = (alt.replace("\x00P", da).replace("\x00D", pa)
               .replace("\x00S", "寄件人 " + rcv.group(1)).replace("\x00R", "收件人 " + snd.group(1)))
+    # a note belongs to its address too: the drop-off note moves up to the pickup row
+    note = re.search(r'\s*<div style="font-size: 13px; color: #5B6470">備註 [^<]*</div>', alt)
+    if note:
+        nd = note.group(0)
+        alt = alt[:note.start()] + alt[note.end():]
+        sender = re.search(r'<div style="font-size: 13px; color: #5B6470">寄件人 [^<]*</div>', alt)
+        assert sender
+        alt = alt[:sender.end()] + nd + alt[sender.end():]
     on = '<button type="button" aria-label="取件與送件地址對調" onClick="{{toggleSwap}}"'
     card, alt = (c.replace('<button type="button" aria-label="取件與送件地址對調"', on, 1) for c in (card, alt))
     b = (b[:i] + '<sc-if value="{{plain}}" hint-placeholder-val="{{ true }}">' + card + '</sc-if>'
