@@ -99,10 +99,11 @@ e2 = entry(2)
 ec = entry(3, code=True)
 _TAG = '<svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linejoin="round" style="flex-shrink: 0"><path d="M3 12V4h8l10 10-8 8z"></path><circle cx="7.5" cy="8.5" r="1.5"></circle></svg>'
 def promo_row(expanded):
-    word, d = ("收起", "M6 15l6-6 6 6") if expanded else ("展開", "M6 9l6 6 6-6")
-    return (f'<button type="button" aria-expanded="{"true" if expanded else "false"}" style="flex-shrink: 0; min-height: 44px; border: 0; background: none; padding: 0 4px; font: inherit; font-size: 14px; color: #3D444D; display: flex; align-items: center; gap: 8px">'
-            + _TAG + '<span style="flex: 1; text-align: left">合作優惠 3 則</span>'
-            f'<span>{word}</span><svg aria-hidden="true" width="18" height="18" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0"><path d="{d}"></path></svg></button>')
+    # gray bar; the page ground is #F4F4F5, so the bar uses the next gray step to stay visible
+    d = "M6 15l6-6 6 6" if expanded else "M6 9l6 6 6-6"
+    return (f'<button type="button" aria-expanded="{"true" if expanded else "false"}" aria-label="快遞專屬優惠，{"收起" if expanded else "展開"}" style="flex-shrink: 0; min-height: 48px; border: 0; border-radius: 10px; background: #E6E8EB; padding: 0 12px 0 14px; font: inherit; font-size: 14px; font-weight: 500; color: #1F2328; display: flex; align-items: center; gap: 8px">'
+            + _TAG + '<span style="flex: 1; text-align: left">快遞專屬優惠</span>'
+            f'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0"><path d="{d}"></path></svg></button>')
 filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(False)))
 opened = rep(clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(True) + "\n    " + ad(3))), CONTENT + '; overflow: hidden', CONTENT + '; overflow: hidden; justify-content: flex-end')
 
@@ -112,9 +113,9 @@ items = [
     ("2 入口：3:1（建議）", e3,
      "兩個地址還沒填完，是吸引下單的時刻：banner 放在物品限制下方（物品限制規則不放在廣告下方）。3:1，約 330 × 110。一次一張、可手動滑，右側露出下一張；不自動播放，每次進入輪流換第一張，讓各車隊公平曝光。「優惠」標籤由 App 疊上。在 iPhone SE 這類小螢幕，banner 會被裁到畫面下緣，要往下滑才看得完整。"),
     ("3 地址填完：收成一行", filled,
-     "送件地址填完後，付款與發票出現，banner 收成物品限制下方的一行「合作優惠 3 則」，不顯示圖片，送出前不搶注意力。不完全藏起來：內容是序號時，使用者還找得到。運費與主按鈕的折後價是計價規則，與 banner 無關。"),
-    ("4 點「展開」", opened,
-     "在原地展開同一組 banner，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。同一張圖、同一個尺寸，車隊不必做兩份素材。按「收起」回到第 3 頁。"),
+     "送件地址填完後，付款與發票出現，banner 收成物品限制下方的一條灰底「快遞專屬優惠」，不顯示圖片、不寫張數，右側只有展開圖示，送出前不搶注意力。不完全藏起來：內容是序號時，使用者還找得到。運費與主按鈕的折後價是計價規則，與 banner 無關。"),
+    ("4 點開「快遞專屬優惠」", opened,
+     "在原地展開同一組 banner，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。同一張圖、同一個尺寸，車隊不必做兩份素材。再點一次（收起圖示）回到第 3 頁。"),
     ("5 比較：入口改 2:1", e2,
      "同第 2 頁，比例改 2:1，約 330 × 165，比兩個地址欄還高，入口時搶過「填地址」；小螢幕上大半會在畫面外。給需求方看「更大」的樣子。"),
     ("6 內容是序號優惠時", ec,
@@ -143,10 +144,10 @@ extra.append(f'<svg role="img" aria-label="從入口到地址填完：填完送�
              f'<path d="M 0 4 L {x2-x1-4} 4" marker-end="url(#dc-arrow-head-filled-ad1)"></path></svg>')
 lab(x1 + 8, ay - 48, 134, "填完送件地址", size=15, lh=20)
 x1, x2 = X0 + 2 * PITCH + SW, X0 + 3 * PITCH - 1
-extra.append(f'<svg role="img" aria-label="從地址填完到展開：點合作優惠" width="{x2-x1}" height="8" viewBox="0 0 {x2-x1} 8" style="position: absolute; left: {x1}px; top: {ay-4}px; overflow: visible; fill: none; stroke: #5B6470; stroke-width: 2; stroke-linecap: round">'
+extra.append(f'<svg role="img" aria-label="從地址填完到展開：點快遞專屬優惠" width="{x2-x1}" height="8" viewBox="0 0 {x2-x1} 8" style="position: absolute; left: {x1}px; top: {ay-4}px; overflow: visible; fill: none; stroke: #5B6470; stroke-width: 2; stroke-linecap: round">'
              f'<defs><marker id="dc-arrow-head-filled-ad2" orient="auto" markerWidth="5" markerHeight="5" refX="2" refY="2" overflow="visible"><path d="M0 0 L4 2 L0 4 Z" style="stroke: none; fill: #5B6470"></path></marker></defs>'
              f'<path d="M 0 4 L {x2-x1-4} 4" marker-end="url(#dc-arrow-head-filled-ad2)"></path></svg>')
-lab(x1 + 8, ay - 48, 134, "點「展開」", size=15, lh=20)
+lab(x1 + 8, ay - 48, 134, "點快遞專屬優惠", size=15, lh=20)
 # separators: current | proposal | comparison
 for k in (1, 4):
     sx = X0 + k * PITCH - (PITCH - SW) // 2
