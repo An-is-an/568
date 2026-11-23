@@ -159,6 +159,8 @@ CARD_ROW = ('<button type="button" style="min-height: 64px; box-sizing: border-b
             '<span style="font-size: 13px">更換</span>'
             '<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0"><path d="M9 5l7 7-7 7"></path></svg></button>')
 f5b, k = re.subn(r'<button type="button" style="height: 52px;[^"]*">新增綁定支付.*?</button>', lambda m: CARD_ROW, f5, count=1, flags=re.S); assert k == 1
+f5b = rep(f5b, '<span style="flex: 1; min-width: 0; font-size: 16px; font-weight: 500">未選擇優惠券</span>',
+          '<span style="flex: 1; min-width: 0; display: flex; flex-direction: column; gap: 2px"><span style="font-size: 16px; font-weight: 500">已選擇優惠券</span><span style="font-size: 13px; font-weight: 500; color: #3D444D">最高可折抵 [金額]</span></span>')
 f6 = hub("card", "error")
 f7 = '''<div style="width: 390px; height: 844px; box-sizing: border-box; background: #FFFFFF; font-family: 'Noto Sans TC', system-ui, sans-serif; color: #1F2328; display: flex; flex-direction: column">
   <div style="height: 56px; flex-shrink: 0; display: flex; align-items: center; padding: 0 8px; position: relative">
