@@ -95,6 +95,14 @@ e21 = entry("2:1")
 ec = entry(code=True)
 filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(False)))
 opened = rep(clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_open())), CONTENT + '; overflow: hidden', CONTENT + '; overflow: hidden; justify-content: flex-end')
+# scrolled up: per the design spec the illustrated header collapses into a white nav bar
+# (plain back chevron, centered title, order history with a dot) -- built so _BAR_RE no longer matches it
+NAV_COLLAPSED = ('<div style="height: 56px; flex-shrink: 0; position: relative; background: #FFFFFF; border-bottom: 1px solid #D5D8DD; display: flex; align-items: center; justify-content: space-between; padding: 0 8px">'
+                 + _BACK_BTN
+                 + '<div style="position: absolute; left: 60px; right: 60px; text-align: center; font-size: 18px; font-weight: 700">即時快遞</div>'
+                 + '<button type="button" aria-label="訂單紀錄" style="position: relative; width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328">'
+                 + _RECEIPT + '<span aria-hidden="true" style="position: absolute; top: 9px; right: 9px; width: 8px; height: 8px; border-radius: 4px; background: #1F2328"></span></button></div>')
+opened, _k = _BAR_RE.subn(lambda m: NAV_COLLAPSED, opened); assert _k == 1
 
 items = [
     ("1 現行做法", CURRENT,
@@ -104,7 +112,7 @@ items = [
     ("3 地址填完：收成一行", filled,
      "送件地址填完後，付款與發票出現，banner 收成物品限制下方的一條灰底「快遞專屬優惠」，不顯示圖片、不寫張數，右側只有展開圖示，送出前不搶注意力。不完全藏起來：內容是序號時，使用者還找得到。運費與主按鈕的折後價是計價規則，與 banner 無關。"),
     ("4 點開「快遞專屬優惠」", opened,
-     "在原地展開同一組 banner，banner 放在同一個灰底區塊裡，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。廣告改為 5:2（約 280 × 112），比 3:1 窄一點、高一點；不放頁數點點，靠右側露出的下一張暗示可滑。與入口同一個區塊、同一個比例，車隊只做一份素材。再點一次（收起圖示）回到第 3 頁。"),
+     "在原地展開同一組 banner，banner 放在同一個灰底區塊裡，不跳頁、不是連結；頁面捲到 banner 的位置；往上滑時頁首照設計規範收成白色導覽列（返回、置中標題、訂單紀錄），插圖區被捲出。廣告改為 5:2（約 280 × 112），比 3:1 窄一點、高一點；不放頁數點點，靠右側露出的下一張暗示可滑。與入口同一個區塊、同一個比例，車隊只做一份素材。再點一次（收起圖示）回到第 3 頁。"),
     ("5 比較：banner 改 2:1", e21,
      "同第 2 頁，banner 改 2:1，約 280 × 140，比 5:2 高約 30；區塊更搶眼，小螢幕上大半會在畫面外。給需求方看「更大」的樣子。"),
     ("6 內容是序號優惠時", ec,

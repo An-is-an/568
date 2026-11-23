@@ -38,7 +38,7 @@ HERO = ('<div style="flex-shrink: 0; position: relative; height: 184px; backgrou
         + '<div style="position: absolute; left: 16px; top: 60px; display: flex; flex-direction: column; gap: 2px">'
           '<div style="font-size: 22px; font-weight: 700">即時快遞</div>'
           '<div style="font-size: 14px; font-weight: 500">機車快捷投遞，準時抵達！</div></div></div>')
-_BAR_RE = re.compile(r'<div style="height: 56px;[^"]*">\s*(?:<button type="button" aria-label="返回".*?</button>\s*)?<div style="font-size: 17px; font-weight: 700">即時快遞</div>\s*</div>', re.S)
+_BAR_RE = re.compile(r'<div style="height: 56px;[^"]*">\s*(?:<button type="button" aria-label="返回"(?:(?!</button>).)*</button>\s*)?<div style="font-size: 17px; font-weight: 700">即時快遞</div>\s*</div>', re.S)
 _AFTER_HERO_RE = re.compile(r'(<div style=")((?:flex: 1; min-height: 0; )?padding: 16px; display: flex; flex-direction: column; gap: 12px)')
 def home_header(h):
     # the current app's header: back and order history float as white squares on the illustration,
