@@ -5,7 +5,7 @@ def root(name):
     s = open(f"{P}/{name}", encoding="utf-8").read()
     # main button copy does not depend on which address is missing
     s = s.replace("M12 3.5l2.6 5.3 5.9.9-4.2 4.1 1 5.8-5.3-2.8-5.3 2.8 1-5.8-4.2-4.1 5.9-.9z", "M12 20s-7.5-4.6-7.5-10.2A4.3 4.3 0 0112 7.2a4.3 4.3 0 017.5 2.6C19.5 15.4 12 20 12 20z")  # favorites use a heart
-    s = s.replace(">填寫送件地址</a>", ">填寫配送地址</a>").replace("填完送件地址後顯示", "填完配送地址後顯示")
+    s = s.replace(">填寫送件地址</a>", ">填寫地址</a>").replace("填完送件地址後顯示", "填完地址後顯示")
     a = s.index("</helmet>") + len("</helmet>")
     b = s.index("</x-dc>")
     return s[a:b].strip()
@@ -32,7 +32,7 @@ _BACK_BTN = ('<button type="button" aria-label="返回" style="width: 44px; heig
              '<svg aria-hidden="true" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M15 5l-7 7 7 7"></path></svg></button>')
 _SQ = "position: absolute; top: 8px; width: 44px; height: 44px; border: 0; border-radius: 10px; background: #FFFFFF; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"
 HERO = ('<div style="flex-shrink: 0; position: relative; height: 184px; background: #E6E8EB">'
-        '<div role="img" aria-label="現行插圖：機車與包裹" style="position: absolute; right: 16px; top: 60px; width: 140px; height: 104px; box-sizing: border-box; border: 1px dashed #A3A9B1; border-radius: 8px; display: flex; align-items: center; justify-content: center; font-size: 12px; color: #5B6470">[現行插圖]</div>'
+        # illustration placeholder removed for a cleaner review with the requester (designer 2026-11-23)
         + _BACK_BTN.replace('style="width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"', f'style="{_SQ}; left: 12px"')
         + ORDER_BTN.replace('style="margin-left: auto; position: relative; width: 44px; height: 44px; border: 0; background: none; padding: 0; display: flex; align-items: center; justify-content: center; color: #1F2328"', f'style="{_SQ}; right: 12px"')
         + '<div style="position: absolute; left: 16px; top: 60px; display: flex; flex-direction: column; gap: 2px">'
@@ -151,7 +151,7 @@ f1 = root("Bp1Home.dc.html")
 PAYSEC_B = r'\s*<div style="font-size: 13px; font-weight: 500; color: #5B6470; margin-top: 8px">付款與發票</div>.*?</svg>\s*</a>\s*</div>'
 f1, k = re.subn(PAYSEC_B, '', f1, count=1, flags=re.S); assert k == 1 and "付款方式" not in f1
 f1, k = re.subn(r'<div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; font-size: 13px">\s*<div style="font-weight: 700">下一步：填寫送件地址</div>\s*<div style="color: #5B6470">還缺 3 項</div>\s*</div>\s*', '', f1); assert k == 1
-f1 = rep(f1, ">繼續</a>", ">填寫配送地址</a>")
+f1 = rep(f1, ">繼續</a>", ">填寫地址</a>")
 f1 = rep(f1, '<a href="#info"', LIMIT_BOX + '\n\n    <a href="#info"')
 f1 = swapify(f1)
 f2 = noswap(root("FtAddressInput.dc.html"))
@@ -233,13 +233,13 @@ SW, SH, PITCH, X0 = 390, 844, 540, 96
 Y1, Y2 = 400, 3248
 def L(i): return X0 + i * PITCH
 
-laneA = [("1 快遞首頁（剛進入）", s1, "取件與寄件人已帶入，地址卡片右側有對調鈕。主按鈕寫「填寫配送地址」，不分取件或送件、不寫還缺幾項；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。Q2"),
+laneA = [("1 快遞首頁（剛進入）", s1, "取件與寄件人已帶入，地址卡片右側有對調鈕。主按鈕寫「填寫地址」，不分取件或送件、不寫還缺幾項；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。Q2"),
          ("2 地址輸入頁", s2, "兩個地址同頁，這一頁只選地址，不放對調鈕。"),
          ("3 地址詳情頁（送件）", s3, "參照 Lalamove，合併需求方 v2 的「地圖＋配送資訊」：地圖在頁首，可拖曳微調位置，地址列可修改；下方填樓層、收件人（必填）與備註，取消配送資訊頁。收件人標題右側的「填入我的資料」一鍵帶入會員姓名與電話；姓名欄的通訊錄也一次填入姓名與電話，最後按的為準。標題右側有「加入最愛」，按確認時地址、樓層與收件人一起存進最愛。"),
          ("4 快遞首頁（已填完）", s4, "送件地址設定完整後，付款與發票才出現，帶入上次的設定。主按鈕變成「送出訂單・金額」。"),
          ("5 確認彈窗", s5, "列出地址與聯絡人、配送時間、付款、發票與金額。取件與送件下面各列出寄件人、收件人，地址填反時比較容易發現。老用戶已讀過運送須知，這裡不再放同意文字。「返回修改」回到第 4 頁。"),
          ("6 送出成功", s6, "沿用現行的送出成功頁，只改成灰階，不在這次的設計範圍。")]
-laneB = [("1 快遞首頁（第一次進入）", f1, "沒有最愛與歷程，取件只帶入目前位置。主按鈕寫「填寫配送地址」；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。"),
+laneB = [("1 快遞首頁（第一次進入）", f1, "沒有最愛與歷程，取件只帶入目前位置。主按鈕寫「填寫地址」；付款與發票在送件地址設定完整前隱藏。物品限制從這一頁就顯示，沿用現行文字。"),
          ("2 地址輸入頁（沒有歷程）", f2, "沒有歷程與最愛，直接列出搜尋結果。"),
          ("3 地址詳情頁（送件）", f3, "與 A 列第 3 頁相同的版型。收件人只能手動填或從通訊錄帶入；加入最愛後，下次出現在快遞首頁的最愛與歷程。"),
          ("4 快遞首頁（還沒綁卡）", f4, "送件地址設定完整後，付款與發票才出現，標「尚未綁定」「尚未設定」。主按鈕是「送出訂單・金額」，不會帶去綁卡或發票。註冊時填過信箱的會員，發票會帶入「個人・會員信箱」，不會缺發票。"),
@@ -351,7 +351,7 @@ place(laneB, Y2, "b")
 lab(X0, 96, 3000, "A｜老用戶：已綁卡、有上次的發票設定", size=36, lh=48, color="#1F2328", weight=700, align="left")
 lab(X0, 148, 3000, "主路徑 6 頁；從最愛或歷程帶入時可略過地址頁", size=18, lh=26, color="#5B6470", align="left")
 lab(X0, 3000, 3000, "B｜第一次下單：沒有歷程、沒綁過卡、沒有發票設定（最差情況）", size=36, lh=48, color="#1F2328", weight=700, align="left")
-lab(X0, 3052, 3000, "主按鈕：第一步寫「填寫配送地址」（不分取送），之後都是「送出訂單・金額」；資料不全時按下不換頁，在缺的欄位出現紅字", size=18, lh=26, color="#5B6470", align="left")
+lab(X0, 3052, 3000, "主按鈕：第一步寫「填寫地址」（不分取送），之後都是「送出訂單・金額」；資料不全時按下不換頁，在缺的欄位出現紅字", size=18, lh=26, color="#5B6470", align="left")
 
 exec(open('laneC.py', encoding='utf-8').read())
 exec(open('laneD.py', encoding='utf-8').read())

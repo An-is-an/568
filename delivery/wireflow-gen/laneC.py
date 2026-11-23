@@ -61,8 +61,8 @@ c1 = (ROOT + '''
     <a href="#info" style="font-size: 13px; font-weight: 500; min-height: 44px; display: flex; align-items: center">計費方式與服務說明</a>
   </div>
   <div style="flex-shrink: 0; background: #FFFFFF; border-top: 1px solid #D5D8DD; padding: 12px 16px 24px; display: flex; flex-direction: column; gap: 12px">
-    <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 15px">運費</div><div style="font-size: 14px; color: #5B6470">填完配送地址後顯示</div></div>
-    ''' + CTA.format("填寫配送地址") + '''
+    <div style="display: flex; align-items: center; justify-content: space-between"><div style="font-size: 15px">運費</div><div style="font-size: 14px; color: #5B6470">填完地址後顯示</div></div>
+    ''' + CTA.format("填寫地址") + '''
   </div>
 </div>''')
 c1 = swapify(c1)
@@ -100,7 +100,7 @@ pkC = rep(pk, "[取件地址]", "[選好的取件地址]")
 c6 = f3
 c7 = rep(f4, "[目前位置]", "[選好的取件地址]")
 
-laneC = [("1 快遞首頁（第一次進入、沒開定位）", c1, "沒有目前位置也沒有上次地址，取件和送件都標「尚未填寫」。主按鈕寫「填寫配送地址」，點了進地址輸入頁，游標停在第一個缺的欄位（取件）。一進來不要求定位權限。"),
+laneC = [("1 快遞首頁（第一次進入、沒開定位）", c1, "沒有目前位置也沒有上次地址，取件和送件都標「尚未填寫」。主按鈕寫「填寫地址」，點了進地址輸入頁，游標停在第一個缺的欄位（取件）。一進來不要求定位權限。"),
          ("2 地址輸入頁（先填取件）", c2, "游標先停在取件欄位。點「使用目前位置」才要求定位權限；之前拒絕過的人點了不會再跳系統詢問，直接出現第 4 頁的提示。"),
          ("3 系統詢問定位權限", c3, "系統對話框，用途說明由 App 提供。只給大概位置時不自動帶入，只用來排序搜尋結果和當地圖起點。"),
          ("4 地址輸入頁（定位未開啟）", c4, "不擋路：說明定位未開啟並給前往設定的入口，同時可以直接搜尋。搜尋結果一定顯示縣市和行政區。"),
