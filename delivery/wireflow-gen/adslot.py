@@ -105,7 +105,22 @@ def promo_row(expanded):
             + _TAG + '<span style="flex: 1; text-align: left">快遞專屬優惠</span>'
             f'<svg aria-hidden="true" width="20" height="20" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" style="flex-shrink: 0"><path d="{d}"></path></svg></button>')
 filled = clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(False)))
-opened = rep(clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_row(True) + "\n    " + ad(3))), CONTENT + '; overflow: hidden', CONTENT + '; overflow: hidden; justify-content: flex-end')
+def promo_open():
+    # expanded: the banners sit inside the same gray block as the header
+    w = 306; h = round(w / 3)
+    def img(label):
+        return (f'<div style="flex-shrink: 0; width: {w}px; position: relative; height: {h}px; box-sizing: border-box; background: #F4F4F5; border: 1px solid #C9CDD3; border-radius: 10px; '
+                f'display: flex; align-items: center; justify-content: center; font-size: 14px; color: #5B6470">{label}'
+                '<div style="position: absolute; left: 8px; top: 8px; font-size: 11px; font-weight: 700; background: #FFFFFF; color: #1F2328; border-radius: 4px; padding: 1px 6px">優惠</div></div>')
+    dots = ('<div aria-hidden="true" style="display: flex; justify-content: center; gap: 4px; padding-right: 12px">'
+            '<span style="width: 16px; height: 4px; border-radius: 2px; background: #1F2328"></span>'
+            '<span style="width: 4px; height: 4px; border-radius: 2px; background: #A3A9B1"></span>'
+            '<span style="width: 4px; height: 4px; border-radius: 2px; background: #A3A9B1"></span></div>')
+    head = promo_row(True).replace("flex-shrink: 0; min-height: 48px; border: 0; border-radius: 10px; background: #E6E8EB;", "flex-shrink: 0; min-height: 48px; border: 0; background: none;")
+    return ('<section aria-label="快遞專屬優惠，第 1 張，共 3 張" style="flex-shrink: 0; background: #E6E8EB; border-radius: 10px; overflow: hidden; display: flex; flex-direction: column">'
+            + head + '<div style="padding: 0 0 12px 12px; display: flex; flex-direction: column; gap: 8px"><div style="display: flex; gap: 8px">'
+            + img("[車隊上傳的優惠圖 3:1]") + img("[第 2 張]") + '</div>' + dots + '</div></section>')
+opened = rep(clip(rep(s4, LIMIT_BOX, LIMIT_BOX + "\n    " + promo_open())), CONTENT + '; overflow: hidden', CONTENT + '; overflow: hidden; justify-content: flex-end')
 
 items = [
     ("1 現行做法", CURRENT,
@@ -115,7 +130,7 @@ items = [
     ("3 地址填完：收成一行", filled,
      "送件地址填完後，付款與發票出現，banner 收成物品限制下方的一條灰底「快遞專屬優惠」，不顯示圖片、不寫張數，右側只有展開圖示，送出前不搶注意力。不完全藏起來：內容是序號時，使用者還找得到。運費與主按鈕的折後價是計價規則，與 banner 無關。"),
     ("4 點開「快遞專屬優惠」", opened,
-     "在原地展開同一組 banner，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。同一張圖、同一個尺寸，車隊不必做兩份素材。再點一次（收起圖示）回到第 3 頁。"),
+     "在原地展開同一組 banner，banner 放在同一個灰底區塊裡，不跳頁、不是連結；頁面捲到 banner 的位置（畫面上方被捲出）。同一張圖、同一個尺寸，車隊不必做兩份素材。再點一次（收起圖示）回到第 3 頁。"),
     ("5 比較：入口改 2:1", e2,
      "同第 2 頁，比例改 2:1，約 330 × 165，比兩個地址欄還高，入口時搶過「填地址」；小螢幕上大半會在畫面外。給需求方看「更大」的樣子。"),
     ("6 內容是序號優惠時", ec,
