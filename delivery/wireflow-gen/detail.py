@@ -53,7 +53,7 @@ def detail(kind, addr, contact="empty"):
   <div style="flex: 1; min-height: 0; margin-top: -16px; position: relative; background: #FFFFFF; border-radius: 16px 16px 0 0; padding: 16px 16px 8px; display: flex; flex-direction: column; gap: 10px">
     <div style="display: flex; align-items: center; justify-content: space-between; gap: 12px; margin: -10px 0 -6px"><h1 style="margin: 0; font-size: 18px; font-weight: 700">{title}</h1>{_FAV}</div>
     <input type="text" aria-label="樓層或門牌號碼，選填" placeholder="樓層或門牌號碼（選填）" style="{_FIELD}">
-    <div style="display: flex; align-items: center; gap: 8px"><span style="font-size: 14px; font-weight: 700">{who}</span>{tag}<button type="button" style="margin-left: auto; min-height: 44px; border: 0; background: none; padding: 0 0 0 12px; font: inherit; font-size: 14px; font-weight: 500; color: #1F2328; text-decoration: underline; text-underline-offset: 3px">填入我的資料</button></div>
+    <div style="display: flex; align-items: center; gap: 8px; height: 20px; margin: 6px 0 -4px"><span style="font-size: 14px; font-weight: 700">{who}</span>{tag}<button type="button" style="margin: -12px 0 -12px auto; min-height: 44px; border: 0; background: none; padding: 0 0 0 12px; font: inherit; font-size: 14px; font-weight: 500; color: #1F2328; text-decoration: underline; text-underline-offset: 3px">填入我的資料</button></div>
     <div style="display: flex; align-items: center; height: 48px; box-sizing: border-box; border: 1px solid #D5D8DD; border-radius: 8px; background: #FFFFFF; padding: 0 2px 0 12px">
       <input type="text" aria-label="{who}姓名" {name} style="flex: 1; min-width: 0; border: 0; background: none; font: inherit; font-size: 15px; color: #1F2328; padding: 0">
       {_CONTACTS}
